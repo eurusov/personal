@@ -7,19 +7,22 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDaoJdbc implements UserDao {
+public class UserDaoJdbc implements UserDao, AutoCloseable {
 
-    public UserDaoJdbc() {}
+    private Connection connection;
 
-    private Connection getConnection() {
-        Connection connection = null;
+    public UserDaoJdbc() {
         try {
             Class.forName(JDBC_DRIVER_NAME);
             connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+            connection.setAutoCommit(false);
         } catch (SQLException | ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    private Connection getConnection() {
         return connection;
     }
 
@@ -69,30 +72,20 @@ public class UserDaoJdbc implements UserDao {
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS);
+        System.out.println(preparedStatement);
+        ResultSet rs = preparedStatement.executeQuery();
 
-        // using try-with-resources to avoid closing resources (boiler plate code)
+        // Process the ResultSet object.
         List<User> users = new ArrayList<>();
-        // Step 1: Establishing a Connection
-        try (Connection connection = getConnection();
-
-             // Step 2:Create a statement using connection object
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS);) {
-            System.out.println(preparedStatement);
-            // Step 3: Execute the query or update query
-            ResultSet rs = preparedStatement.executeQuery();
-
-            // Step 4: Process the ResultSet object.
-            while (rs.next()) {
-                Long id = rs.getLong("id");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                users.add(new User(id, firstName, lastName, email, country));
-            }
-        } catch (SQLException e) {
-            printSQLException(e);
+        while (rs.next()) {
+            Long id = rs.getLong("id");
+            String firstName = rs.getString("first_name");
+            String lastName = rs.getString("last_name");
+            String email = rs.getString("email");
+            String country = rs.getString("country");
+            users.add(new User(id, firstName, lastName, email, country));
         }
         return users;
     }
@@ -162,4 +155,10 @@ public class UserDaoJdbc implements UserDao {
     private static final String DELETE_USER_SQL = "delete from users where id = ?;";
     private static final String UPDATE_USERS_SQL
             = "update users set first_name = ?, last_name = ?, email= ?, country =? where id = ?;";
+
+    @Override
+    public void close() throws Exception {
+        connection.commit();
+        connection.close();
+    }
 }

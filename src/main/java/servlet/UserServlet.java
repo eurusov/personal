@@ -25,7 +25,11 @@ public class UserServlet extends HttpServlet {
 
     public void init() {
 //        SessionFactory sessionFactory = DBService.getSessionFactory();
-        userDao = new UserDaoHibernate();
+        userDao = new UserDaoJdbc();
+    }
+
+    public UserDao getUserDao() {
+        return new UserDaoJdbc();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -63,7 +67,12 @@ public class UserServlet extends HttpServlet {
 
     private void listUser(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        List<User> listUser = userDao.getAllUsers();
+        List<User> listUser = null;
+        try (UserDao userDao = getUserDao()) {
+            listUser = userDao.getAllUsers();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         request.setAttribute("listUser", listUser);
         RequestDispatcher dispatcher = request.getRequestDispatcher("user-list.jsp");
         dispatcher.forward(request, response);
