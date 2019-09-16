@@ -1,7 +1,8 @@
 package servlet;
 
-import dao.UserDao;
+import dao.UserDaoJdbc;
 import model.User;
+import util.DBException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,10 +17,10 @@ import java.util.List;
 @WebServlet("/")
 public class UserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private UserDao userDao;
+    private UserDaoJdbc userDaoJdbc;
 
     public void init() {
-        userDao = new UserDao();
+        userDaoJdbc = new UserDaoJdbc();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,14 +51,14 @@ public class UserServlet extends HttpServlet {
                     listUser(request, response);
                     break;
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | DBException ex) {
             throw new ServletException(ex);
         }
     }
 
     private void listUser(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        List<User> listUser = userDao.selectAllUsers();
+        List<User> listUser = userDaoJdbc.getAllUsers();
         request.setAttribute("listUser", listUser);
         RequestDispatcher dispatcher = request.getRequestDispatcher("user-list.jsp");
         dispatcher.forward(request, response);
@@ -72,7 +73,7 @@ public class UserServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
-        User existingUser = userDao.selectUser(id);
+        User existingUser = userDaoJdbc.getUser(id);
         RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
         request.setAttribute("user", existingUser);
         dispatcher.forward(request, response);
@@ -80,18 +81,18 @@ public class UserServlet extends HttpServlet {
     }
 
     private void insertUser(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
+            throws SQLException, IOException, DBException {
         String firstName = request.getParameter("first_name");
         String lastName = request.getParameter("last_name");
         String email = request.getParameter("email");
         String country = request.getParameter("country");
         User newUser = new User(firstName, lastName, email, country);
-        userDao.insertUser(newUser);
+        userDaoJdbc.addUser(newUser);
         response.sendRedirect("list");
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
+            throws SQLException, IOException, DBException {
         Long id = Long.parseLong(request.getParameter("id"));
         String firstName = request.getParameter("first_name");
         String lastName = request.getParameter("last_name");
@@ -99,14 +100,14 @@ public class UserServlet extends HttpServlet {
         String country = request.getParameter("country");
 
         User user = new User(id, firstName, lastName, email, country);
-        userDao.updateUser(user);
+        userDaoJdbc.updateUser(user);
         response.sendRedirect("list");
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
+            throws SQLException, IOException, DBException {
         Long id = Long.parseLong(request.getParameter("id"));
-        userDao.deleteUser(id);
+        userDaoJdbc.deleteUser(id);
         response.sendRedirect("list");
 
     }
