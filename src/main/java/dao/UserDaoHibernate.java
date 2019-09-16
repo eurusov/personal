@@ -15,7 +15,7 @@ public class UserDaoHibernate implements UserDao, AutoCloseable {
     private Transaction transaction;
 
     public UserDaoHibernate() {
-        new DBService();
+//        new DBService();
         this.session = DBService.getSessionFactory().openSession();
         transaction = this.session.beginTransaction();
     }
