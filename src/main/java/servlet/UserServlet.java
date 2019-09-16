@@ -1,9 +1,12 @@
 package servlet;
 
 import dao.UserDao;
+import dao.UserDaoHibernate;
 import dao.UserDaoJdbc;
 import model.User;
+import org.hibernate.SessionFactory;
 import util.DBException;
+import util.DBService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,7 +24,8 @@ public class UserServlet extends HttpServlet {
     private UserDao userDao;
 
     public void init() {
-        userDao = new UserDaoJdbc();
+//        SessionFactory sessionFactory = DBService.getSessionFactory();
+        userDao = new UserDaoHibernate();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

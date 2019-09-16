@@ -15,9 +15,9 @@ import java.sql.SQLException;
 public class DBService {
     private static SessionFactory sessionFactory;
 
-    static {
-        sessionFactory = createSessionFactory();
-    }
+//    static {
+//        sessionFactory = createSessionFactory();
+//    }
 
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
@@ -27,25 +27,11 @@ public class DBService {
     }
 
     private static SessionFactory createSessionFactory() {
-        Configuration configuration = getMySqlConfiguration();
+        Configuration configuration = new Configuration().configure();
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
-    }
-
-    private static Configuration getMySqlConfiguration() {
-        Configuration configuration = new Configuration();
-
-        configuration.addAnnotatedClass(User.class);
-
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/usersdb?serverTimezone=UTC");
-        configuration.setProperty("hibernate.connection.username", "root");
-        configuration.setProperty("hibernate.connection.password", "msql74_");
-        configuration.setProperty("hibernate.show_sql", "true");
-        configuration.setProperty("hibernate.hbm2ddl.auto", "validate");
-        return configuration;
     }
 
     public static void deleteAll() {
