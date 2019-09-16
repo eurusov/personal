@@ -8,28 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJdbc implements UserDao {
-    private static final String jdbcURL = "jdbc:mysql://localhost:3306/usersdb?serverTimezone=UTC";
-    private static final String jdbcUsername = "root";
-    private static final String jdbcPassword = "msql74_";
-
-    private static final String INSERT_USERS_SQL
-            = "INSERT INTO users (first_name, last_name, email, country) VALUES"
-            + " (?, ?, ?, ?);";
-
-    private static final String SELECT_USER_BY_ID
-            = "select id, first_name, last_name, email, country from users where id =?";
-    private static final String SELECT_ALL_USERS = "select * from users";
-    private static final String DELETE_USER_SQL = "delete from users where id = ?;";
-    private static final String UPDATE_USERS_SQL
-            = "update users set first_name = ?, last_name = ?, email= ?, country =? where id = ?;";
 
     public UserDaoJdbc() {}
 
     private Connection getConnection() {
         Connection connection = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            Class.forName(JDBC_DRIVER_NAME);
+            connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
         } catch (SQLException | ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -161,5 +147,19 @@ public class UserDaoJdbc implements UserDao {
             }
         }
     }
-}
 
+    private static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/usersdb?serverTimezone=UTC";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "msql74_";
+
+    private static final String INSERT_USERS_SQL
+            = "INSERT INTO users (first_name, last_name, email, country) VALUES"
+            + " (?, ?, ?, ?);";
+    private static final String SELECT_USER_BY_ID
+            = "select id, first_name, last_name, email, country from users where id =?";
+    private static final String SELECT_ALL_USERS = "select * from users";
+    private static final String DELETE_USER_SQL = "delete from users where id = ?;";
+    private static final String UPDATE_USERS_SQL
+            = "update users set first_name = ?, last_name = ?, email= ?, country =? where id = ?;";
+}
