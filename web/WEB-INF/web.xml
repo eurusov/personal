@@ -5,6 +5,6 @@
          version="4.0">
 
     <listener>
-        <listener-class>util.HibernateListener</listener-class>
+        <listener-class>util.Initializer</listener-class>
     </listener>
 </web-app>

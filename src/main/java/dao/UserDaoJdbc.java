@@ -1,5 +1,6 @@
 package dao;
 
+import daoContext.DaoContext;
 import model.User;
 import util.DBException;
 

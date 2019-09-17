@@ -1,4 +1,4 @@
-package dao;
+package daoContext;
 
 import org.hibernate.Session;
 

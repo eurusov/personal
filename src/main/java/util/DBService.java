@@ -1,7 +1,7 @@
 package util;
 
-import dao.DaoContext;
-import dao.JdbcConnection;
+import daoContext.DaoContext;
+import daoContext.JdbcConnection;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,12 +15,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBService {
-//    private static
-    private static SessionFactory sessionFactory;
 
-//    static {
-//        sessionFactory = createSessionFactory();
-//    }
+    public static DaoType daoType;
+
+    private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {

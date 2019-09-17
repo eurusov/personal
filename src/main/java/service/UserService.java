@@ -8,6 +8,8 @@ public class UserService {
 
     private UserDao userDao;
 
+
+
     public static UserService getInstance() {
         if (instance == null) {
             instance = new UserService();
