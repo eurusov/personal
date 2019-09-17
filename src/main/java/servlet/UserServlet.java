@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import service.UserService;
 import util.DBException;
 import util.DBService;
+import util.DaoType;
 import util.StringConst;
 
 import javax.servlet.RequestDispatcher;
@@ -24,7 +25,7 @@ import java.util.Properties;
 @WebServlet("/")
 public class UserServlet extends HttpServlet {
     private UserService userService;
-    private String daoType;
+    private DaoType daoType;
 
     public void init() {
         InputStream config = getServletContext().getResourceAsStream(StringConst.CONFIG);
@@ -34,17 +35,16 @@ public class UserServlet extends HttpServlet {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        daoType = properties.getProperty("dao.type");
+        daoType = DaoType.valueOf(properties.getProperty("dao.type").trim().toUpperCase());
     }
 
     public UserDao getUserDao() {
-
-        if (daoType.equalsIgnoreCase("Hibernate")) {
+        if (daoType == DaoType.HIBERNATE) {
             SessionFactory sessionFactory = DBService.getSessionFactory();
             Session sess = sessionFactory.openSession();
             DaoContext daoContext = new HibernateSession(sess);
             return new UserDaoHibernate(daoContext);
-        } else if (daoType.equalsIgnoreCase("JDBC")) {
+        } else if (daoType == DaoType.JDBC) {
             DaoContext daoContext = DBService.getNewConnection();
             return new UserDaoJdbc(daoContext);
         }
