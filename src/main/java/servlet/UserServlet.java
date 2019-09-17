@@ -1,12 +1,13 @@
 package servlet;
 
-import dao.UserDao;
-import dao.UserDaoHibernate;
-import dao.UserDaoJdbc;
+import dao.*;
 import model.User;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import service.UserService;
 import util.DBException;
 import util.DBService;
+import util.StringConst;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,21 +16,39 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 @WebServlet("/")
 public class UserServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private UserDao userDao;
+    private UserService userService;
+    private String daoType;
 
     public void init() {
-//        SessionFactory sessionFactory = DBService.getSessionFactory();
-        userDao = new UserDaoJdbc();
+        InputStream config = getServletContext().getResourceAsStream(StringConst.CONFIG);
+        Properties properties = new Properties();
+        try {
+            properties.load(config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        daoType = properties.getProperty("dao.type");
     }
 
     public UserDao getUserDao() {
-        return new UserDaoJdbc();
+
+        if (daoType.equalsIgnoreCase("Hibernate")) {
+            SessionFactory sessionFactory = DBService.getSessionFactory();
+            Session sess = sessionFactory.openSession();
+            DaoContext daoContext = new HibernateSession(sess);
+            return new UserDaoHibernate(daoContext);
+        } else if (daoType.equalsIgnoreCase("JDBC")) {
+            DaoContext daoContext = DBService.getNewConnection();
+            return new UserDaoJdbc(daoContext);
+        }
+        return null;
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -85,13 +104,17 @@ public class UserServlet extends HttpServlet {
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, ServletException, IOException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        User existingUser = userDao.getUser(id);
+            throws SQLException, ServletException, IOException, DBException {
+        User existingUser = null;
+        try (UserDao userDao = getUserDao()) {
+            long id = Long.parseLong(request.getParameter("id"));
+            existingUser = userDao.getUser(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
         request.setAttribute("user", existingUser);
         dispatcher.forward(request, response);
-
     }
 
     private void insertUser(HttpServletRequest request, HttpServletResponse response)
@@ -101,7 +124,11 @@ public class UserServlet extends HttpServlet {
         String email = request.getParameter("email");
         String country = request.getParameter("country");
         User newUser = new User(firstName, lastName, email, country);
-        userDao.addUser(newUser);
+        try (UserDao userDao = getUserDao()) {
+            userDao.addUser(newUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.sendRedirect("list");
     }
 
@@ -114,15 +141,22 @@ public class UserServlet extends HttpServlet {
         String country = request.getParameter("country");
 
         User user = new User(id, firstName, lastName, email, country);
-        userDao.updateUser(user);
+        try (UserDao userDao = getUserDao()) {
+            userDao.updateUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.sendRedirect("list");
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, DBException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        userDao.deleteUser(id);
+        long id = Long.parseLong(request.getParameter("id"));
+        try (UserDao userDao = getUserDao()) {
+            userDao.deleteUser(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.sendRedirect("list");
-
     }
 }

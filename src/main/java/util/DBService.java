@@ -1,6 +1,7 @@
 package util;
 
-import model.User;
+import dao.DaoContext;
+import dao.JdbcConnection;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -10,9 +11,11 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBService {
+//    private static
     private static SessionFactory sessionFactory;
 
 //    static {
@@ -32,6 +35,23 @@ public class DBService {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+
+    public static DaoContext getNewConnection() {
+        try {
+            Class.forName(StringConst.JDBC_DRIVER_NAME);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new JdbcConnection(connection);
     }
 
     public static void deleteAll() {

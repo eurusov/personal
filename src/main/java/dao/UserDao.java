@@ -10,9 +10,9 @@ public interface UserDao extends AutoCloseable{
 
     void addUser(User usr) throws DBException;
 
-    User getUser(long id);
+    User getUser(long id) throws DBException;
 
-    List<User> getAllUsers() throws SQLException;
+    List<User> getAllUsers() throws SQLException, DBException;
 
     boolean updateUser(User user) throws DBException;
 
