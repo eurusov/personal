@@ -1,8 +1,8 @@
 package dao;
 
-import daoContext.DaoContext;
+import dao.context.DaoContext;
 import model.User;
-import util.DBException;
+import service.DBException;
 
 import java.sql.*;
 import java.util.ArrayList;

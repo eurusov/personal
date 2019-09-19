@@ -1,7 +1,7 @@
 package util;
 
-import daoContext.DaoContext;
-import daoContext.JdbcConnection;
+import dao.context.DaoContext;
+import dao.context.JdbcConnection;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -9,6 +9,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.service.ServiceRegistry;
+import service.DaoType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

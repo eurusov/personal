@@ -1,10 +1,10 @@
 package dao;
 
-import daoContext.DaoContext;
+import dao.context.DaoContext;
 import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import util.DBException;
+import service.DBException;
 
 import java.util.List;
 

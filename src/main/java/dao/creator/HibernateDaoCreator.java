@@ -1,28 +1,28 @@
-package daoContext.producer;
+package dao.creator;
 
-import daoContext.DaoContext;
-import daoContext.HibernateSession;
+import dao.context.DaoContext;
+import dao.context.HibernateSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
-public class SessionProducer implements DaoContextProducer {
-    private static SessionProducer sessionProducer;
+public class HibernateDaoCreator implements UserDaoCreator<Session> {
+    private static HibernateDaoCreator hibernateDaoCreator;
     private static SessionFactory sessionFactory;
 
-    private SessionProducer() {
+    private HibernateDaoCreator() {
         if (sessionFactory == null) {
             sessionFactory = createSessionFactory();
         }
     }
 
-    public static SessionProducer getInstance() {
-        if (sessionProducer == null) {
-            sessionProducer = new SessionProducer();
+    public static HibernateDaoCreator getInstance() {
+        if (hibernateDaoCreator == null) {
+            hibernateDaoCreator = new HibernateDaoCreator();
         }
-        return sessionProducer;
+        return hibernateDaoCreator;
     }
 
     @Override
@@ -37,5 +37,11 @@ public class SessionProducer implements DaoContextProducer {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    @Override
+    public DaoContext<Session> get() {
+        Session sess = sessionFactory.openSession();
+        return new HibernateSession(sess);
     }
 }

@@ -1,18 +1,14 @@
 package servlet;
 
 import dao.*;
-import daoContext.DaoContext;
-import daoContext.HibernateSession;
-import daoContext.producer.DaoContextProducer;
-import daoContext.producer.SessionProducer;
+import dao.context.DaoContext;
+import dao.creator.JdbcDaoCreator;
+import dao.creator.UserDaoCreator;
+import dao.creator.HibernateDaoCreator;
 import model.User;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import service.UserService;
-import util.DBException;
+import service.DBException;
 import util.DBService;
-import util.DaoType;
-import util.StringConst;
+import service.DaoType;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,10 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 
 @WebServlet("/")
 public class UserServlet extends HttpServlet {
@@ -33,9 +27,19 @@ public class UserServlet extends HttpServlet {
 //    public void init() {
 //    }
 
+    private UserDaoCreator userDaoCreator;
+
+    public void init() {
+        if (DBService.daoType == DaoType.HIBERNATE) {
+            userDaoCreator = HibernateDaoCreator.getInstance();
+        } else if (DBService.daoType == DaoType.JDBC) {
+            userDaoCreator = new JdbcDaoCreator();
+        }
+    }
+
     public UserDao getUserDao() {
         if (DBService.daoType == DaoType.HIBERNATE) {
-            DaoContextProducer sessionProducer = SessionProducer.getInstance();
+            UserDaoCreator sessionProducer = HibernateDaoCreator.getInstance();
             return new UserDaoHibernate(sessionProducer.getDaoContext());
         } else if (DBService.daoType == DaoType.JDBC) {
             DaoContext daoContext = DBService.getNewConnection();
