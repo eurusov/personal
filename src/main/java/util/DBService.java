@@ -22,14 +22,6 @@ public class DBService {
         }
     }
 
-//    private static SessionFactory createSessionFactory() {
-//        Configuration configuration = new Configuration().configure();
-//        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-//        builder.applySettings(configuration.getProperties());
-//        ServiceRegistry serviceRegistry = builder.build();
-//        return configuration.buildSessionFactory(serviceRegistry);
-//    }
-
 
 //    public static DaoContext getNewConnection() {
 //        try {

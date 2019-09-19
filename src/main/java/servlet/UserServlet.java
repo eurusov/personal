@@ -53,8 +53,8 @@ public class UserServlet extends HttpServlet {
                     listUser(request, response);
                     break;
             }
-        } catch (DBException ex) {
-            throw new ServletException(ex);
+        } catch (DBException e) {
+            throw new ServletException(e);
         }
     }
 
