@@ -5,6 +5,7 @@ import dao.UserDao;
 import dao.context.DaoContext;
 import dao.context.JdbcConnection;
 import service.DBException;
+import util.StringConst;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -49,22 +50,8 @@ public class JdbcDaoCreator implements UserDaoCreator<Connection> {
 
     private static Connection getMysqlConnection() throws DBException {
         try {
-            DriverManager.registerDriver((Driver) Class.forName("com.mysql.cj.jdbc.Driver").newInstance());
-
-            StringBuilder url = new StringBuilder();
-
-            url.
-                    append("jdbc:mysql://").        //db type
-                    append("localhost:").           //host name
-                    append("3306/").                //port
-                    append("usersdb?").          //db name
-                    append("user=root&").           //login
-                    append("password=msql74_&").    //password
-                    append("serverTimezone=UTC");   //timezone
-
-            System.out.println("URL: " + url + "\n");
-            return DriverManager.getConnection(url.toString());
-
+            DriverManager.registerDriver((Driver) Class.forName(StringConst.JDBC_DRIVER_NAME).newInstance());
+            return DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
         } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new DBException(e);

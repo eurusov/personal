@@ -3,6 +3,7 @@ package dao;
 import com.sun.istack.internal.Nullable;
 import model.User;
 import service.DBException;
+import util.StringConst;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,8 +20,8 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public Long addUser(User user) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(SQL_ADD);
-             PreparedStatement stmt2 = connection.prepareStatement(SQL_GET_ID_BY_EMAIL)
+        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_ADD);
+             PreparedStatement stmt2 = connection.prepareStatement(StringConst.SQL_GET_ID_BY_EMAIL)
         ) {
             int idx = 1;
             stmt.setString(idx++, user.getFirstName());
@@ -41,13 +42,13 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public User getUser(Long id) throws DBException {
-        return getUserBySqlQuery(SQL_GET_BY_ID, id.toString());
+        return getUserBySqlQuery(StringConst.SQL_GET_BY_ID, id.toString());
     }
 
     @Override
     public List<User> getAllUser() throws DBException {
         try (Statement stmt = connection.createStatement()) {
-            ResultSet result = stmt.executeQuery(SQL_SELECT_ALL);
+            ResultSet result = stmt.executeQuery(StringConst.SQL_SELECT_ALL);
             List<User> clientsList = new ArrayList<>();
             while (result.next()) {
                 User user = new User(
@@ -67,7 +68,7 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public boolean updateUser(User user) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(SQL_UPDATE)) {
+        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_UPDATE)) {
             int idx = 1;
             stmt.setString(idx++, user.getFirstName());
             stmt.setString(idx++, user.getLastName());
@@ -83,7 +84,7 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public boolean deleteUser(Long id) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(SQL_DEL_BY_ID)) {
+        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_DEL_BY_ID)) {
             stmt.setLong(1, id);
             int updatedRows = stmt.executeUpdate();
             return updatedRows == 1;
@@ -127,12 +128,4 @@ public class UserDaoJdbc implements UserDao {
             throw new DBException(e);
         }
     }
-
-    private static final String TABLE_NAME = "users";
-    private static final String SQL_GET_ID_BY_EMAIL = "SELECT id FROM " + TABLE_NAME + " WHERE email=?";
-    private static final String SQL_ADD = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, email, country) values (?, ?, ?, ?)";
-    private static final String SQL_GET_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id=?";
-    private static final String SQL_DEL_BY_ID = "DELETE FROM " + TABLE_NAME + " WHERE id=?";
-    private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME + " SET first_name=?, last_name=?, email=?, country=? WHERE id=?";
-    private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME;
 }

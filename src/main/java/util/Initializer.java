@@ -31,7 +31,7 @@ public class Initializer implements ServletContextListener {
     }
 
     private static void configDaoType(ServletContext servletContext) throws IOException, DBException {
-        InputStream config = servletContext.getResourceAsStream(StringConst.CONFIG);
+        InputStream config = servletContext.getResourceAsStream(StringConst.CONFIG_PATH);
         Properties properties = new Properties();
         properties.load(config);
         DBService.setDaoCreatorType(
