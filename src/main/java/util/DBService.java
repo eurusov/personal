@@ -8,7 +8,11 @@ import service.DaoType;
 
 public class DBService {
 
-    public static UserDaoCreator userDaoCreator;
+    private static UserDaoCreator userDaoCreator;
+
+    public static UserDaoCreator getUserDaoCreator() {
+        return userDaoCreator;
+    }
 
     public static void setDaoCreatorType(DaoType daoType) throws DBException {
         if (daoType == DaoType.HIBERNATE) {

@@ -22,14 +22,15 @@ public class Initializer implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent event) {
-//        try {
-//            SessionProducer.getInstance().getDaoContext().close(); // Free all resources
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            DBService.getUserDaoCreator().close(); // Free all resources
+        } catch (Exception e) {
+            System.out.println("Exception while closing UserDaoCreator at contextDestroyed(...)");
+            e.printStackTrace();
+        }
     }
 
-    private void configDaoType(ServletContext servletContext) throws IOException, DBException {
+    private static void configDaoType(ServletContext servletContext) throws IOException, DBException {
         InputStream config = servletContext.getResourceAsStream(StringConst.CONFIG);
         Properties properties = new Properties();
         properties.load(config);

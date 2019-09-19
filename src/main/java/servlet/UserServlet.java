@@ -21,7 +21,7 @@ public class UserServlet extends HttpServlet {
 
     public void init() {
         if (userService == null) {
-            userService = new UserService(DBService.userDaoCreator);
+            userService = new UserService(DBService.getUserDaoCreator());
         }
     }
 

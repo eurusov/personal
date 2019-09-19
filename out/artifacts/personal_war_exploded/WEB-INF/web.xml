@@ -7,4 +7,16 @@
     <listener>
         <listener-class>util.Initializer</listener-class>
     </listener>
+
+
+    <filter>
+        <filter-name>CharacterSetFilter</filter-name>
+        <filter-class>servlet.CharacterSetFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CharacterSetFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
 </web-app>
