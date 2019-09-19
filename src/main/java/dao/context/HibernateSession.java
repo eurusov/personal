@@ -6,7 +6,7 @@ import dao.context.transaction.HibernateTransaction;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
-public class HibernateSession extends AbstractContext<Session> {
+public class HibernateSession extends AbstractDaoContext<Session> {
 
     public HibernateSession(Session session) {
         super(session);

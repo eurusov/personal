@@ -7,7 +7,7 @@ import dao.context.transaction.DaoTransaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class JdbcConnection extends AbstractContext<Connection> {
+public class JdbcConnection extends AbstractDaoContext<Connection> {
 
     public JdbcConnection(Connection connection) {
         super(connection);

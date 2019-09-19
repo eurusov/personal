@@ -5,9 +5,9 @@ import dao.context.DaoContext;
 import service.DBException;
 
 /**
- * Объект, который умеет создавать UserDao и UserDaoContext.
- *
- * @param <T> контекст, с которым работает конкретная реализация UserDao.
+ * Сущность, которая умеет создавать конкретные реализации {@link UserDao} и {@link DaoContext}.
+ * <p></p>
+ * @param <T> контекст, с которым работает конкретная реализация {@link UserDao}.
  *            <p>Для Hibernate - это Session, для Jdbc - Connection.
  */
 public interface UserDaoCreator<T> {
@@ -15,7 +15,7 @@ public interface UserDaoCreator<T> {
     UserDao createDao(DaoContext<T> daoContext);
 
     /**
-     * Создает и возвращает или {@code DaoContext<Session>} или {@code daoContext<Connection>}.
+     * Создает и возвращает или {@code DaoContext<Session>} или {@code DaoContext<Connection>}.
      */
     DaoContext<T> createDaoContext() throws DBException;
 
