@@ -6,9 +6,9 @@
     <title>User Management</title>
 </head>
 <body>
-<center>
+<div style="text-align: center;">
     <h1>User Management</h1>
-</center>
+</div>
 <div align="center">
     <table border="1" cellpadding="5">
         <caption><h2>List of Users</h2></caption>
