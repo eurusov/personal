@@ -8,12 +8,6 @@
 <body>
 <center>
     <h1>User Management</h1>
-    <h2>
-        <a href="new">Add New User</a>
-        &nbsp;&nbsp;&nbsp;
-        <a href="list">List All Users</a>
-
-    </h2>
 </center>
 <div align="center">
     <table border="1" cellpadding="5">
@@ -42,5 +36,11 @@
         </c:forEach>
     </table>
 </div>
+<div style="text-align: center;">
+    <h4>
+        <a href="new">Add User</a>
+    </h4>
+</div>
+
 </body>
 </html>
