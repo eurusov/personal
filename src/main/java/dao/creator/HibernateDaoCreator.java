@@ -32,6 +32,7 @@ public class HibernateDaoCreator implements UserDaoCreator<Session> {
 
     @Override
     public void close() {
+//        sessionFactory.getCurrentSession().close();
         sessionFactory.close();
     }
 

@@ -57,7 +57,7 @@ public class JdbcDaoCreator implements UserDaoCreator<Connection> {
                     append("jdbc:mysql://").        //db type
                     append("localhost:").           //host name
                     append("3306/").                //port
-                    append("users_test?").          //db name
+                    append("usersdb?").          //db name
                     append("user=root&").           //login
                     append("password=msql74_&").    //password
                     append("serverTimezone=UTC");   //timezone

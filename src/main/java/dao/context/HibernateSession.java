@@ -20,7 +20,10 @@ public class HibernateSession extends AbstractContext<Session> {
     @Override
     public void close() throws DBException {
         try {
-            super.getContext().close();
+            Session session = super.getContext();
+            if (session.isOpen()) {
+                session.close();
+            }
         } catch (HibernateException e) {
             e.printStackTrace();
             throw new DBException(e);
