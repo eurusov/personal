@@ -1,17 +1,23 @@
 package dao.creator;
 
+import dao.UserDao;
 import dao.context.DaoContext;
-import service.DaoType;
-
-import java.util.function.Supplier;
+import service.DBException;
 
 /**
- * Сущность которая является поставщиком DaoContext: содержит DriverManager для JDBC, или SessionFactory для Hibernate.
- * Метод возвращает: JdbcConnection или HibernateSession соответственно.
+ * Объект, который умеет создавать UserDao и UserDaoContext.
+ *
+ * @param <T> контекст, с которым работает конкретная реализация UserDao.
+ *            <p>Для Hibernate - это Session, для Jdbc - Connection.
  */
-public interface UserDaoCreator<T> extends Supplier<DaoContext<T>> {
+public interface UserDaoCreator<T> {
 
-    static DaoType daoType = DaoType.JDBC;
+    UserDao createDao(DaoContext<T> daoContext);
 
-    DaoContext<T> getDaoContext();
+    /**
+     * Создает и возвращает или {@code DaoContext<Session>} или {@code daoContext<Connection>}.
+     */
+    DaoContext<T> createDaoContext() throws DBException;
+
+    void close();
 }

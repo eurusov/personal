@@ -1,22 +1,29 @@
 package dao.context;
 
+import service.DBException;
+import dao.context.transaction.DaoTransaction;
+import dao.context.transaction.HibernateTransaction;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
-public class HibernateSession implements DaoContext<Session> {
-
-    private Session session;
+public class HibernateSession extends AbstractContext<Session> {
 
     public HibernateSession(Session session) {
-        this.session = session;
+        super(session);
     }
 
     @Override
-    public Session getContext() {
-        return session;
+    public DaoTransaction beginTransaction() {
+        return new HibernateTransaction(super.getContext().beginTransaction());
     }
 
     @Override
-    public void close() throws Exception {
-        session.close();
+    public void close() throws DBException {
+        try {
+            super.getContext().close();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            throw new DBException(e);
+        }
     }
 }

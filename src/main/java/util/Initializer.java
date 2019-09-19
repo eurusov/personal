@@ -1,5 +1,6 @@
 package util;
 
+import service.DBException;
 import service.DaoType;
 
 import javax.servlet.ServletContext;
@@ -13,9 +14,11 @@ public class Initializer implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent event) {
         ServletContext servletContext = event.getServletContext();
-        configDaoType(servletContext);
-
-//        SessionProducer.getInstance();
+        try {
+            configDaoType(servletContext);
+        } catch (IOException | DBException e) {
+            e.printStackTrace();
+        }
     }
 
     public void contextDestroyed(ServletContextEvent event) {
@@ -26,14 +29,17 @@ public class Initializer implements ServletContextListener {
 //        }
     }
 
-    private void configDaoType(ServletContext servletContext) {
+    private void configDaoType(ServletContext servletContext) throws IOException, DBException {
         InputStream config = servletContext.getResourceAsStream(StringConst.CONFIG);
         Properties properties = new Properties();
-        try {
-            properties.load(config);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        DBService.daoType = DaoType.valueOf(properties.getProperty("dao.type").trim().toUpperCase());
+        properties.load(config);
+        DBService.setDaoCreatorType(
+                DaoType.valueOf(
+                        properties
+                                .getProperty("dao.type")
+                                .trim()
+                                .toUpperCase()
+                )
+        );
     }
 }

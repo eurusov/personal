@@ -1,5 +1,7 @@
 package dao.creator;
 
+import dao.UserDaoHibernate;
+import dao.UserDao;
 import dao.context.DaoContext;
 import dao.context.HibernateSession;
 import org.hibernate.Session;
@@ -9,26 +11,28 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 public class HibernateDaoCreator implements UserDaoCreator<Session> {
-    private static HibernateDaoCreator hibernateDaoCreator;
+
     private static SessionFactory sessionFactory;
 
-    private HibernateDaoCreator() {
+    public HibernateDaoCreator() {
         if (sessionFactory == null) {
             sessionFactory = createSessionFactory();
         }
     }
 
-    public static HibernateDaoCreator getInstance() {
-        if (hibernateDaoCreator == null) {
-            hibernateDaoCreator = new HibernateDaoCreator();
-        }
-        return hibernateDaoCreator;
+    @Override
+    public UserDao createDao(DaoContext<Session> daoContext) {
+        return new UserDaoHibernate(daoContext.getContext());
     }
 
     @Override
-    public DaoContext<Session> getDaoContext() {
-        Session sess = sessionFactory.openSession();
-        return new HibernateSession(sess);
+    public DaoContext<Session> createDaoContext() {
+        return new HibernateSession(sessionFactory.openSession());
+    }
+
+    @Override
+    public void close() {
+        sessionFactory.close();
     }
 
     private static SessionFactory createSessionFactory() {
@@ -37,11 +41,5 @@ public class HibernateDaoCreator implements UserDaoCreator<Session> {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
-    }
-
-    @Override
-    public DaoContext<Session> get() {
-        Session sess = sessionFactory.openSession();
-        return new HibernateSession(sess);
     }
 }

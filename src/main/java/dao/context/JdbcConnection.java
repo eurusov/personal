@@ -1,22 +1,37 @@
 package dao.context;
 
+import dao.context.transaction.JdbcTransaction;
+import service.DBException;
+import dao.context.transaction.DaoTransaction;
+
 import java.sql.Connection;
+import java.sql.SQLException;
 
-public class JdbcConnection implements DaoContext<Connection> {
-
-    private Connection connection;
+public class JdbcConnection extends AbstractContext<Connection> {
 
     public JdbcConnection(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     @Override
-    public Connection getContext() {
-        return connection;
+    public DaoTransaction beginTransaction() {
+        return new JdbcTransaction(super.getContext());
     }
 
     @Override
-    public void close() throws Exception {
-        connection.close();
+    public void close() throws DBException {
+        try {
+            Connection connection = super.getContext();
+            if (!connection.getAutoCommit()) {
+                connection.commit();
+            }
+            /* Необязательно закрывать здесь коннекшн, так как если он будет закрыт (здесь, или по таймауту автоматически),
+            то при создании нового DaoContext, будет открыт новый. (см. dao.creator.JdbcDaoCreator.createDaoContext())
+            Чтобы избежать постоянного закрытия-открытия коннекшена, уберем здесь connection.close()
+             */
+//            connection.close();
+        } catch (SQLException e) {
+            throw new DBException(e);
+        }
     }
 }

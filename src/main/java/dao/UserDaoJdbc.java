@@ -1,143 +1,138 @@
 package dao;
 
-import dao.context.DaoContext;
+import com.sun.istack.internal.Nullable;
 import model.User;
 import service.DBException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class UserDaoJdbc implements UserDao, AutoCloseable {
+public class UserDaoJdbc implements UserDao {
 
-    private DaoContext daoContext;
+    private Connection connection;
 
-    public UserDaoJdbc(DaoContext daoContext) {
-        this.daoContext = daoContext;
-    }
-
-    private Connection getConnection() {
-        return (Connection) daoContext.getContext();
+    public UserDaoJdbc(Connection connection) {
+        this.connection = connection;
     }
 
     @Override
-    public void addUser(User user) throws DBException {
-        try (PreparedStatement stm = getConnection().prepareStatement(INSERT_USERS_SQL)) {
-            stm.setString(1, user.getFirstName());
-            stm.setString(2, user.getLastName());
-            stm.setString(3, user.getEmail());
-            stm.setString(4, user.getCountry());
-            System.out.println(stm);
-            stm.executeUpdate();
+    public Long addUser(User user) throws DBException {
+        try (PreparedStatement stmt = connection.prepareStatement(SQL_ADD);
+             PreparedStatement stmt2 = connection.prepareStatement(SQL_GET_ID_BY_EMAIL)
+        ) {
+            int idx = 1;
+            stmt.setString(idx++, user.getFirstName());
+            stmt.setString(idx++, user.getLastName());
+            stmt.setString(idx++, user.getEmail());
+            stmt.setString(idx++, user.getCountry());
+            stmt.executeUpdate();
+            stmt2.setString(1, user.getEmail());
+            ResultSet resultSet = stmt2.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            }
+            return null;
         } catch (SQLException e) {
-            printSQLException(e);
             throw new DBException(e);
         }
     }
 
     @Override
-    public User getUser(long id) throws DBException {
-        try (PreparedStatement stm = getConnection().prepareStatement(SELECT_USER_BY_ID)) {
-            stm.setLong(1, id);
-            System.out.println(stm);
-            ResultSet rs = stm.executeQuery();
-
-            // Process the ResultSet object.
-            User user = null;
-            if (rs.next()) {
-                String firstName = rs.getString("first_name");
-                String lastMame = rs.getString("last_name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                user = new User(id, firstName, lastMame, email, country);
-            }
-            return user;
-        } catch (SQLException e) {
-            printSQLException(e);
-            throw new DBException(e);
-        }
+    public User getUser(Long id) throws DBException {
+        return getUserBySqlQuery(SQL_GET_BY_ID, id.toString());
     }
 
     @Override
-    public List<User> getAllUsers() throws DBException {
-        try (Statement stm = getConnection().createStatement()) {
-            System.out.println(SELECT_ALL_USERS);
-            ResultSet rs = stm.executeQuery(SELECT_ALL_USERS);
-
-            // Process the ResultSet object.
-            List<User> users = new ArrayList<>();
-            while (rs.next()) {
-                Long id = rs.getLong("id");
-                String firstName = rs.getString("first_name");
-                String lastName = rs.getString("last_name");
-                String email = rs.getString("email");
-                String country = rs.getString("country");
-                users.add(new User(id, firstName, lastName, email, country));
+    public List<User> getAllUser() throws DBException {
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet result = stmt.executeQuery(SQL_SELECT_ALL);
+            List<User> clientsList = new ArrayList<>();
+            while (result.next()) {
+                User user = new User(
+                        result.getLong("id"),
+                        result.getString("first_name"),
+                        result.getString("last_name"),
+                        result.getString("email"),
+                        result.getString("country")
+                );
+                clientsList.add(user);
             }
-            return users;
+            return (clientsList.isEmpty()) ? Collections.emptyList() : clientsList;
         } catch (SQLException e) {
-            printSQLException(e);
             throw new DBException(e);
         }
     }
 
     @Override
     public boolean updateUser(User user) throws DBException {
-        try (PreparedStatement stm = getConnection().prepareStatement(UPDATE_USERS_SQL)) {
-            stm.setString(1, user.getFirstName());
-            stm.setString(2, user.getLastName());
-            stm.setString(3, user.getEmail());
-            stm.setString(4, user.getCountry());
-            stm.setLong(5, user.getId());
-            System.out.println(stm);
-            return stm.executeUpdate() == 1;
+        try (PreparedStatement stmt = connection.prepareStatement(SQL_UPDATE)) {
+            int idx = 1;
+            stmt.setString(idx++, user.getFirstName());
+            stmt.setString(idx++, user.getLastName());
+            stmt.setString(idx++, user.getEmail());
+            stmt.setString(idx++, user.getCountry());
+            stmt.setLong(idx++, user.getId());
+            int updatedRows = stmt.executeUpdate();
+            return updatedRows == 1;
         } catch (SQLException e) {
-            printSQLException(e);
             throw new DBException(e);
         }
     }
 
     @Override
-    public boolean deleteUser(long id) throws DBException {
-        try (PreparedStatement stm = getConnection().prepareStatement(DELETE_USER_SQL)) {
-            stm.setLong(1, id);
-            System.out.println(stm);
-            return stm.executeUpdate() == 1;
+    public boolean deleteUser(Long id) throws DBException {
+        try (PreparedStatement stmt = connection.prepareStatement(SQL_DEL_BY_ID)) {
+            stmt.setLong(1, id);
+            int updatedRows = stmt.executeUpdate();
+            return updatedRows == 1;
         } catch (SQLException e) {
-            printSQLException(e);
             throw new DBException(e);
         }
     }
 
-    private void printSQLException(SQLException ex) {
-        for (Throwable e : ex) {
-            if (e instanceof SQLException) {
-                e.printStackTrace(System.err);
-                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
-                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
-                System.err.println("Message: " + e.getMessage());
-                Throwable t = ex.getCause();
-                while (t != null) {
-                    System.out.println("Cause: " + t);
-                    t = t.getCause();
-                }
+    /**
+     * Вспомогательный метод.<p>Выполняет SQL запрос с параметрами,
+     * и если результат содержит хотя бы один объект User,
+     * то возвращает первого, иначе - <code>null</code>.
+     * <p>В логике данной программы предполагается, что корректный запрос для данного метода
+     * должен возвращать результат состоящий только из одной записи или пустой результат.
+     * <p>В противном случае возвращается <code>User</code> соответствующий первой записи из <code>ResultSet</code>.
+     *
+     * @param sql  строка содержащая SQL запрос
+     * @param args подстановочные параметры для запроса
+     * @return объект <code>User</code>, найденный в таблице по данному SQL запросу,
+     * или <code>null</code> если результат запроса пуст
+     */
+    private @Nullable
+    User getUserBySqlQuery(final String sql, final String... args)
+            throws DBException {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            for (int i = 0; i < args.length; i++) {
+                stmt.setString(i + 1, args[i]);
             }
+            ResultSet resultSet = stmt.executeQuery();
+            if (!resultSet.next()) {
+                return null;
+            }
+            return new User(
+                    resultSet.getLong("id"),
+                    resultSet.getString("first_name"),
+                    resultSet.getString("last_name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("country")
+            );
+        } catch (SQLException e) {
+            throw new DBException(e);
         }
     }
 
-    private static final String INSERT_USERS_SQL
-            = "INSERT INTO users (first_name, last_name, email, country) VALUES"
-            + " (?, ?, ?, ?);";
-    private static final String SELECT_USER_BY_ID
-            = "select id, first_name, last_name, email, country from users where id =?";
-    private static final String SELECT_ALL_USERS = "select * from users";
-    private static final String DELETE_USER_SQL = "delete from users where id = ?;";
-    private static final String UPDATE_USERS_SQL
-            = "update users set first_name = ?, last_name = ?, email= ?, country =? where id = ?;";
-
-    @Override
-    public void close() throws Exception {
-        getConnection().commit();
-        getConnection().close();
-    }
+    private static final String TABLE_NAME = "users";
+    private static final String SQL_GET_ID_BY_EMAIL = "SELECT id FROM " + TABLE_NAME + " WHERE email=?";
+    private static final String SQL_ADD = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, email, country) values (?, ?, ?, ?)";
+    private static final String SQL_GET_BY_ID = "SELECT * FROM " + TABLE_NAME + " WHERE id=?";
+    private static final String SQL_DEL_BY_ID = "DELETE FROM " + TABLE_NAME + " WHERE id=?";
+    private static final String SQL_UPDATE = "UPDATE " + TABLE_NAME + " SET first_name=?, last_name=?, email=?, country=? WHERE id=?";
+    private static final String SQL_SELECT_ALL = "SELECT * FROM " + TABLE_NAME;
 }

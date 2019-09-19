@@ -1,60 +1,56 @@
 package dao;
 
-import dao.context.DaoContext;
 import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import service.DBException;
 
 import java.util.List;
 
-public class UserDaoHibernate implements UserDao, AutoCloseable {
-    private DaoContext daoContext;
+public class UserDaoHibernate implements UserDao {
 
-    public UserDaoHibernate(DaoContext daoContext) {
-        this.daoContext = daoContext;
-    }
+    private Session session;
 
-    private Session getSession() {
-        return (Session) daoContext.getContext();
+    public UserDaoHibernate(Session session) {
+        this.session = session;
     }
 
     @Override
-    public void addUser(User user) throws DBException {
-        getSession().save(user);
+    public Long addUser(User user) {
+        return (Long) session.save(user);
     }
 
     @Override
-    public User getUser(long id) {
-        return (User) getSession().get(User.class, id);
+    public User getUser(Long id) {
+        return (User) session.get(User.class, id);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<User> getAllUsers() {
-        Query query = getSession().createQuery("FROM User");
-        return (List<User>) query.list();
+    public List<User> getAllUser() {
+        Query query = session.createQuery("FROM User");
+        return query.list();
     }
 
     @Override
-    public boolean updateUser(User user) throws DBException {
-        getSession().save(user);
-        return true;
-    }
-
-    @Override
-    public boolean deleteUser(long id) throws DBException {
-        User user = getUser(id);
-        if (user == null) {
+    public boolean updateUser(User updatedUser) {
+        User existingUser = (User) session.get(User.class, updatedUser.getId());
+        if (existingUser == null) {
             return false;
         }
-        getSession().delete(getUser(id));
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setCountry(updatedUser.getCountry());
         return true;
     }
 
     @Override
-    public void close() {
-//        getSession().getTransaction().commit();
-        getSession().close();
+    public boolean deleteUser(Long id) {
+        User userToDelete = (User) session.get(User.class, id);
+        if (userToDelete == null) {
+            return false;
+        }
+        session.delete(userToDelete);
+        return true;
     }
 }

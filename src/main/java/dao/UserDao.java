@@ -3,22 +3,21 @@ package dao;
 import model.User;
 import service.DBException;
 
-import java.sql.SQLException;
 import java.util.List;
 
-public interface UserDao extends AutoCloseable {
+public interface UserDao {
 
     // create
-    void addUser(User usr) throws DBException;
+    Long addUser(User user) throws DBException;
 
     // read
-    User getUser(long id) throws DBException;
+    User getUser(Long id) throws DBException;
 
-    List<User> getAllUsers() throws SQLException, DBException;
+    List<User> getAllUser() throws DBException;
 
     // update
     boolean updateUser(User user) throws DBException;
 
     // delete
-    boolean deleteUser(long id) throws DBException;
+    boolean deleteUser(Long id) throws DBException;
 }

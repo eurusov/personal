@@ -1,80 +1,70 @@
 package util;
 
-import dao.context.DaoContext;
-import dao.context.JdbcConnection;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.internal.SessionFactoryImpl;
-import org.hibernate.service.ServiceRegistry;
+import dao.creator.HibernateDaoCreator;
+import dao.creator.JdbcDaoCreator;
+import dao.creator.UserDaoCreator;
+import service.DBException;
 import service.DaoType;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class DBService {
 
-    public static DaoType daoType;
+    public static UserDaoCreator userDaoCreator;
 
-    private static SessionFactory sessionFactory;
-
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            sessionFactory = createSessionFactory();
-        }
-        return sessionFactory;
-    }
-
-    private static SessionFactory createSessionFactory() {
-        Configuration configuration = new Configuration().configure();
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-        builder.applySettings(configuration.getProperties());
-        ServiceRegistry serviceRegistry = builder.build();
-        return configuration.buildSessionFactory(serviceRegistry);
-    }
-
-
-    public static DaoContext getNewConnection() {
-        try {
-            Class.forName(StringConst.JDBC_DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
-            connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return new JdbcConnection(connection);
-    }
-
-    public static void deleteAll() {
-        Session sess = sessionFactory.openSession();
-        Transaction tx = sess.beginTransaction();
-        sess.createQuery("delete from User").executeUpdate();
-        tx.commit();
-        sess.close();
-    }
-
-    public static void printConnectInfo() {
-        try {
-            SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) sessionFactory;
-            Connection connection = sessionFactoryImpl.getConnectionProvider().getConnection();
-//            Connection connection = sessionFactory.getSessionFactoryOptions().getServiceRegistry()
-//                    .getService(ConnectionProvider.class).getConnection();
-            System.out.println("DB name: " + connection.getMetaData().getDatabaseProductName());
-            System.out.println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
-            System.out.println("Driver: " + connection.getMetaData().getDriverName());
-            System.out.println("Autocommit: " + connection.getAutoCommit());
-            System.out.println();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static void setDaoCreatorType(DaoType daoType) throws DBException {
+        if (daoType == DaoType.HIBERNATE) {
+            userDaoCreator = new HibernateDaoCreator();
+        } else if (daoType == DaoType.JDBC) {
+            userDaoCreator = new JdbcDaoCreator();
         }
     }
+
+//    private static SessionFactory createSessionFactory() {
+//        Configuration configuration = new Configuration().configure();
+//        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+//        builder.applySettings(configuration.getProperties());
+//        ServiceRegistry serviceRegistry = builder.build();
+//        return configuration.buildSessionFactory(serviceRegistry);
+//    }
+
+
+//    public static DaoContext getNewConnection() {
+//        try {
+//            Class.forName(StringConst.JDBC_DRIVER_NAME);
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        Connection connection = null;
+//        try {
+//            connection = DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
+//            connection.setAutoCommit(false);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return new JdbcConnection(connection);
+//    }
+
+//    public static void deleteAll() {
+//        Session sess = sessionFactory.openSession();
+//        Transaction tx = sess.beginTransaction();
+//        sess.createQuery("delete from User").executeUpdate();
+//        tx.commit();
+//        sess.close();
+//    }
+
+//    public static void printConnectInfo() {
+//        try {
+//            SessionFactoryImpl sessionFactoryImpl = (SessionFactoryImpl) sessionFactory;
+//            Connection connection = sessionFactoryImpl.getConnectionProvider().getConnection();
+////            Connection connection = sessionFactory.getSessionFactoryOptions().getServiceRegistry()
+////                    .getService(ConnectionProvider.class).getConnection();
+//            System.out.println("DB name: " + connection.getMetaData().getDatabaseProductName());
+//            System.out.println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
+//            System.out.println("Driver: " + connection.getMetaData().getDriverName());
+//            System.out.println("Autocommit: " + connection.getAutoCommit());
+//            System.out.println();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 }
