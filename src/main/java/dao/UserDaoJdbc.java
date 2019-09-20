@@ -26,17 +26,17 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public Long addUser(User user) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_ADD);
-             PreparedStatement stmt2 = connection.prepareStatement(StringConst.SQL_GET_ID_BY_EMAIL)
+        try (PreparedStatement prepStmtInsert = connection.prepareStatement(StringConst.SQL_INSERT);
+             PreparedStatement prepStmtGetId = connection.prepareStatement(StringConst.SQL_GET_ID_BY_EMAIL)
         ) {
-            int idx = 1;
-            stmt.setString(idx++, user.getFirstName());
-            stmt.setString(idx++, user.getLastName());
-            stmt.setString(idx++, user.getEmail());
-            stmt.setString(idx++, user.getCountry());
-            stmt.executeUpdate();
-            stmt2.setString(1, user.getEmail());
-            ResultSet resultSet = stmt2.executeQuery();
+            int idx = 0;
+            prepStmtInsert.setString(++idx, user.getFirstName());
+            prepStmtInsert.setString(++idx, user.getLastName());
+            prepStmtInsert.setString(++idx, user.getEmail());
+            prepStmtInsert.setString(++idx, user.getCountry());
+            prepStmtInsert.executeUpdate();
+            prepStmtGetId.setString(1, user.getEmail());
+            ResultSet resultSet = prepStmtGetId.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getLong(1);
             }
@@ -55,7 +55,7 @@ public class UserDaoJdbc implements UserDao {
     public List<User> getAllUser() throws DBException {
         try (Statement stmt = connection.createStatement()) {
             ResultSet result = stmt.executeQuery(StringConst.SQL_SELECT_ALL);
-            List<User> clientsList = new ArrayList<>();
+            List<User> userList = new ArrayList<>();
             while (result.next()) {
                 User user = new User(
                         result.getLong(COL_ID),
@@ -64,9 +64,9 @@ public class UserDaoJdbc implements UserDao {
                         result.getString(COL_EMAIL),
                         result.getString(COL_COUNTRY)
                 );
-                clientsList.add(user);
+                userList.add(user);
             }
-            return (clientsList.isEmpty()) ? Collections.emptyList() : clientsList;
+            return (userList.isEmpty()) ? Collections.emptyList() : userList;
         } catch (SQLException e) {
             throw new DBException(e);
         }
@@ -74,15 +74,14 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public boolean updateUser(User user) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_UPDATE)) {
-            int idx = 1;
-            stmt.setString(idx++, user.getFirstName());
-            stmt.setString(idx++, user.getLastName());
-            stmt.setString(idx++, user.getEmail());
-            stmt.setString(idx++, user.getCountry());
-            stmt.setLong(idx++, user.getId());
-            int updatedRows = stmt.executeUpdate();
-            return updatedRows == 1;
+        try (PreparedStatement prepStmt = connection.prepareStatement(StringConst.SQL_UPDATE)) {
+            int idx = 0;
+            prepStmt.setString(++idx, user.getFirstName());
+            prepStmt.setString(++idx, user.getLastName());
+            prepStmt.setString(++idx, user.getEmail());
+            prepStmt.setString(++idx, user.getCountry());
+            prepStmt.setLong(++idx, user.getId());
+            return prepStmt.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new DBException(e);
         }
@@ -90,10 +89,9 @@ public class UserDaoJdbc implements UserDao {
 
     @Override
     public boolean deleteUser(Long id) throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(StringConst.SQL_DEL_BY_ID)) {
-            stmt.setLong(1, id);
-            int updatedRows = stmt.executeUpdate();
-            return updatedRows == 1;
+        try (PreparedStatement prepStmt = connection.prepareStatement(StringConst.SQL_DEL_BY_ID)) {
+            prepStmt.setLong(1, id);
+            return prepStmt.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new DBException(e);
         }
@@ -115,11 +113,11 @@ public class UserDaoJdbc implements UserDao {
     private @Nullable
     User getUserBySqlQuery(final String sql, final String... args)
             throws DBException {
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement prepStmt = connection.prepareStatement(sql)) {
             for (int i = 0; i < args.length; i++) {
-                stmt.setString(i + 1, args[i]);
+                prepStmt.setString(i + 1, args[i]);
             }
-            ResultSet resultSet = stmt.executeQuery();
+            ResultSet resultSet = prepStmt.executeQuery();
             if (!resultSet.next()) {
                 return null;
             }
