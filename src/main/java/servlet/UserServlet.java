@@ -74,7 +74,7 @@ public class UserServlet extends HttpServlet {
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, DBException {
-        long id = Long.parseLong(request.getParameter("id"));
+        Long id = Long.valueOf(request.getParameter("id"));
         User existingUser = userService.getUser(id);
         RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
         request.setAttribute("user", existingUser);
@@ -83,32 +83,32 @@ public class UserServlet extends HttpServlet {
 
     private void insertUser(HttpServletRequest request, HttpServletResponse response)
             throws IOException, DBException {
-        String firstName = request.getParameter("first_name");
-        String lastName = request.getParameter("last_name");
-        String email = request.getParameter("email");
-        String country = request.getParameter("country");
-        User newUser = new User(firstName, lastName, email, country);
-        userService.addUser(newUser);
+        userService.addUser(getUserFromRequest(request));
         response.sendRedirect("list");
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response)
             throws IOException, DBException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        String firstName = request.getParameter("first_name");
-        String lastName = request.getParameter("last_name");
-        String email = request.getParameter("email");
-        String country = request.getParameter("country");
-
-        User user = new User(id, firstName, lastName, email, country);
-        userService.updateUser(user);
+        userService.updateUser(getUserFromRequest(request));
         response.sendRedirect("list");
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
             throws IOException, DBException {
-        long id = Long.parseLong(request.getParameter("id"));
+        Long id = Long.valueOf(request.getParameter("id"));
         userService.deleteUser(id);
         response.sendRedirect("list");
+    }
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        String idStr = request.getParameter("id");
+        String firstName = request.getParameter("first_name");
+        String lastName = request.getParameter("last_name");
+        String email = request.getParameter("email");
+        String country = request.getParameter("country");
+        if (idStr == null) {
+            return new User(firstName, lastName, email, country);
+        }
+        return new User(Long.valueOf(idStr), firstName, lastName, email, country);
     }
 }
