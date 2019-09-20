@@ -52,7 +52,7 @@ public class HibernateDaoCreator implements UserDaoCreator<Session> {
     }
 
     private static SessionFactory createSessionFactory() throws DBException {
-        Configuration configuration = null;
+        Configuration configuration;
         try {
             configuration = getHibernateConfiguration();
         } catch (IOException e) {
@@ -63,11 +63,5 @@ public class HibernateDaoCreator implements UserDaoCreator<Session> {
         builder.applySettings(configuration.getProperties());
         ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
-
-//        Configuration configuration = new Configuration().configure();
-//        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-//        builder.applySettings(configuration.getProperties());
-//        ServiceRegistry serviceRegistry = builder.build();
-//        return configuration.buildSessionFactory(serviceRegistry);
     }
 }

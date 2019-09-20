@@ -14,6 +14,12 @@ public class UserDaoJdbc implements UserDao {
 
     private Connection connection;
 
+    private static final String COL_ID = "id";
+    private static final String COL_FIRST_NAME = "first_name";
+    private static final String COL_LAST_NAME = "last_name";
+    private static final String COL_EMAIL = "email";
+    private static final String COL_COUNTRY = "country";
+
     public UserDaoJdbc(Connection connection) {
         this.connection = connection;
     }
@@ -52,11 +58,11 @@ public class UserDaoJdbc implements UserDao {
             List<User> clientsList = new ArrayList<>();
             while (result.next()) {
                 User user = new User(
-                        result.getLong("id"),
-                        result.getString("first_name"),
-                        result.getString("last_name"),
-                        result.getString("email"),
-                        result.getString("country")
+                        result.getLong(COL_ID),
+                        result.getString(COL_FIRST_NAME),
+                        result.getString(COL_LAST_NAME),
+                        result.getString(COL_EMAIL),
+                        result.getString(COL_COUNTRY)
                 );
                 clientsList.add(user);
             }
@@ -118,11 +124,11 @@ public class UserDaoJdbc implements UserDao {
                 return null;
             }
             return new User(
-                    resultSet.getLong("id"),
-                    resultSet.getString("first_name"),
-                    resultSet.getString("last_name"),
-                    resultSet.getString("email"),
-                    resultSet.getString("country")
+                    resultSet.getLong(COL_ID),
+                    resultSet.getString(COL_FIRST_NAME),
+                    resultSet.getString(COL_LAST_NAME),
+                    resultSet.getString(COL_EMAIL),
+                    resultSet.getString(COL_COUNTRY)
             );
         } catch (SQLException e) {
             throw new DBException(e);

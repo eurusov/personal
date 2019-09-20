@@ -3,6 +3,9 @@ package servlet;
 import javax.servlet.*;
 import java.io.IOException;
 
+/**
+ * Без этого русские буквы при редактировании и добавлении становятся кракозябрами
+ */
 public class CharacterSetFilter implements Filter {
 
     public void doFilter(
