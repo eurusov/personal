@@ -2,7 +2,7 @@ package util;
 
 public abstract class StringConst {
 
-    public static final String CONFIG_PATH = "WEB-INF/config.properties";
+    public static final String CONFIG_PATH = "WEB-INF/classes/config.properties";
 
     public static final String JDBC_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     public static final String JDBC_URL = "jdbc:mysql://localhost:3306/usersdb?serverTimezone=UTC";

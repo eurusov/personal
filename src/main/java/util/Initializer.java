@@ -6,10 +6,12 @@ import service.DaoType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@WebListener
 public class Initializer implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent event) {
