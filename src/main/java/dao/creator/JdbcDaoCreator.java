@@ -5,11 +5,9 @@ import dao.UserDao;
 import dao.context.DaoContext;
 import dao.context.JdbcConnection;
 import service.DBException;
-import util.StringConst;
+import util.DBService;
 
 import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class JdbcDaoCreator implements UserDaoCreator<Connection> {
@@ -19,7 +17,7 @@ public class JdbcDaoCreator implements UserDaoCreator<Connection> {
     public JdbcDaoCreator() throws DBException {
         try {
             if (connection == null || connection.isClosed()) {
-                connection = getMysqlConnection();
+                connection = DBService.getMysqlConnection();
             }
         } catch (SQLException e) {
             throw new DBException(e);
@@ -35,7 +33,7 @@ public class JdbcDaoCreator implements UserDaoCreator<Connection> {
     public DaoContext<Connection> createDaoContext() throws DBException {
         try {
             if (connection.isClosed()) {
-                connection = getMysqlConnection();
+                connection = DBService.getMysqlConnection();
             }
             return new JdbcConnection(connection);
         } catch (SQLException e) {
@@ -48,13 +46,4 @@ public class JdbcDaoCreator implements UserDaoCreator<Connection> {
 
     }
 
-    private static Connection getMysqlConnection() throws DBException {
-        try {
-            DriverManager.registerDriver((Driver) Class.forName(StringConst.JDBC_DRIVER_NAME).newInstance());
-            return DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
-        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new DBException(e);
-        }
-    }
 }
