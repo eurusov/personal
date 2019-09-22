@@ -61,7 +61,9 @@ public class DBService {
     public static Connection getMysqlConnection() throws DBException {
         try {
             DriverManager.registerDriver((Driver) Class.forName(StringConst.JDBC_DRIVER_NAME).newInstance());
-            return DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
+            Connection connection = DriverManager.getConnection(StringConst.JDBC_URL, StringConst.USERNAME, StringConst.PASSWORD);
+            connection.setAutoCommit(false);
+            return connection;
         } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new DBException(e);

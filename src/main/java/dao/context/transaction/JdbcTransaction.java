@@ -23,4 +23,16 @@ public class JdbcTransaction implements DaoTransaction {
             throw new DBException(e);
         }
     }
+
+    @Override
+    public void rollback() throws DBException {
+        try {
+            if (!connection.getAutoCommit() && !connection.isClosed()) {
+                connection.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DBException(e);
+        }
+    }
 }

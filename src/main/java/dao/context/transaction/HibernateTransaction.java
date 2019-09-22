@@ -21,4 +21,14 @@ public class HibernateTransaction implements DaoTransaction {
             throw new DBException(e);
         }
     }
+
+    @Override
+    public void rollback() throws DBException {
+        try {
+            transaction.rollback();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            throw new DBException(e);
+        }
+    }
 }

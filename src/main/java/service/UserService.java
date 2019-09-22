@@ -18,18 +18,24 @@ public class UserService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Long addUser(User user) throws DBException {
+        DaoTransaction tx = null;
+        Long assignedId = null; // result
         try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
             UserDao userDao = userDaoCreator.createDao(daoContext);
-            DaoTransaction tx = daoContext.beginTransaction();
-
-            Long assignedId = userDao.addUser(user);
-
+            tx = daoContext.beginTransaction();
+            assignedId = userDao.addUser(user); // do work
             tx.commit();
-            return assignedId;
+        } catch (DBException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
         }
+        return assignedId;
     }
 
+    @SuppressWarnings("unchecked")
     public User getUser(Long id) throws DBException {
         try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
             UserDao userDao = userDaoCreator.createDao(daoContext);
@@ -37,6 +43,7 @@ public class UserService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<User> getAllUser() throws DBException {
         try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
             UserDao userDao = userDaoCreator.createDao(daoContext);
@@ -44,27 +51,39 @@ public class UserService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public boolean updateUser(User user) throws DBException {
+        DaoTransaction tx = null;
+        boolean wasUpdated = false; // result
         try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
             UserDao userDao = userDaoCreator.createDao(daoContext);
-            DaoTransaction tx = daoContext.beginTransaction();
-
-            boolean updated = userDao.updateUser(user);
-
+            tx = daoContext.beginTransaction();
+            wasUpdated = userDao.updateUser(user); // do work
             tx.commit();
-            return updated;
+        } catch (DBException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
         }
+        return wasUpdated;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean deleteUser(Long id) throws DBException {
+        DaoTransaction tx = null;
+        boolean wasDeleted = false; // result
         try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
             UserDao userDao = userDaoCreator.createDao(daoContext);
-            DaoTransaction tx = daoContext.beginTransaction();
+            tx = daoContext.beginTransaction();
 
-            boolean deleted = userDao.deleteUser(id);
+            wasDeleted = userDao.deleteUser(id); // do work
 
             tx.commit();
-            return deleted;
+        } catch (DBException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
         }
+        return wasDeleted;
     }
 }

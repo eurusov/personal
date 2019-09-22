@@ -14,4 +14,6 @@ import service.UserService;
  */
 public interface DaoTransaction {
     void commit() throws DBException;
+
+    void rollback() throws DBException;
 }
