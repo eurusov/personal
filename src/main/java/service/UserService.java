@@ -86,4 +86,11 @@ public class UserService {
         }
         return wasDeleted;
     }
+
+    public User getUser(String email, String password) throws DBException {
+        try (DaoContext daoContext = userDaoCreator.createDaoContext()) {
+            UserDao userDao = userDaoCreator.createDao(daoContext);
+            return userDao.getUser(email, password);
+        }
+    }
 }

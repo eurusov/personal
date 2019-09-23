@@ -97,6 +97,11 @@ public class UserDaoJdbc implements UserDao {
         }
     }
 
+    @Override
+    public User getUser(String email, String password) throws DBException {
+        return getUserBySqlQuery(StringConst.SQL_GET_BY_EMAIL_PSW, email, password);
+    }
+
     /**
      * Вспомогательный метод.<p>Выполняет SQL запрос с параметрами,
      * и если результат содержит хотя бы один объект User,

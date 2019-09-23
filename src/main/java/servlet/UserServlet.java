@@ -49,13 +49,34 @@ public class UserServlet extends HttpServlet {
                 case "/update":
                     updateUser(request, response);
                     break;
-                default:
+                case "/list":
                     listUser(request, response);
+                case "/login":
+                    doLogin(request, response);
+                default:
+                    login(request, response);
                     break;
             }
         } catch (DBException e) {
             throw new ServletException(e);
         }
+    }
+
+    private void doLogin(HttpServletRequest request, HttpServletResponse response) throws DBException, IOException, ServletException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        System.out.println("email: " + email);
+        System.out.println("password: " + password);
+        User user = userService.getUser(email,password);
+        if (user!=null) {
+            listUser(request,response);
+        }
+
+    }
+
+    private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
+        dispatcher.forward(request, response);
     }
 
     private void listUser(HttpServletRequest request, HttpServletResponse response)

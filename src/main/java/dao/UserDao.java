@@ -20,4 +20,6 @@ public interface UserDao {
 
     // delete
     boolean deleteUser(Long id) throws DBException;
+
+    User getUser(String email, String password) throws DBException;
 }

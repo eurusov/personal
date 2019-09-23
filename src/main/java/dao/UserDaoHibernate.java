@@ -3,6 +3,7 @@ package dao;
 import model.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import service.DBException;
 
 import java.util.List;
 
@@ -52,5 +53,10 @@ public class UserDaoHibernate implements UserDao {
         }
         session.delete(userToDelete);
         return true;
+    }
+
+    @Override
+    public User getUser(String email, String password) throws DBException {
+        return null;
     }
 }
