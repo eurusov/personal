@@ -56,7 +56,10 @@ public class UserDaoHibernate implements UserDao {
     }
 
     @Override
-    public User getUser(String email, String password) throws DBException {
-        return null;
+    public User getUser(String email, String password) {
+        Query query = session.createQuery("FROM User WHERE email=:e_mail and password=:pass");
+        query.setParameter("e_mail", email);
+        query.setParameter("pass", password);
+        return (User) query.uniqueResult();
     }
 }
