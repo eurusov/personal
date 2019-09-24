@@ -65,13 +65,12 @@ public class UserServlet extends HttpServlet {
     private void doLogin(HttpServletRequest request, HttpServletResponse response) throws DBException, IOException, ServletException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        System.out.println("email: " + email);
-        System.out.println("password: " + password);
-        User user = userService.getUser(email,password);
-        if (user!=null) {
-            listUser(request,response);
+//        System.out.println("email: " + email);
+//        System.out.println("password: " + password);
+        User user = userService.getUser(email, password);
+        if (user != null) {
+            listUser(request, response);
         }
-
     }
 
     private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -123,13 +122,13 @@ public class UserServlet extends HttpServlet {
 
     private User getUserFromRequest(HttpServletRequest request) {
         String idStr = request.getParameter("id");
+        Long id = (idStr == null) ? null : Long.valueOf(idStr);
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
         String firstName = request.getParameter("first_name");
         String lastName = request.getParameter("last_name");
-        String email = request.getParameter("email");
         String country = request.getParameter("country");
-        if (idStr == null) {
-            return new User(firstName, lastName, email, country);
-        }
-        return new User(Long.valueOf(idStr), firstName, lastName, email, country);
+        String role = request.getParameter("role");
+        return new User(id, email, password, firstName, lastName, country, role);
     }
 }

@@ -15,6 +15,7 @@
     <title>User Management Application</title>
 </head>
 <body>
+<%--value="<jsp:useBean id="user" scope="request" type="model.User"/>--%>
 <div style="text-align: center;">
     <h1>User Management</h1>
 </div>
@@ -40,6 +41,22 @@
                     <input type="hidden" name="id" value="<c:out value='${user.id}' />"/>
                 </c:if>
                 <tr>
+                    <th>User Email:</th>
+                    <td>
+                        <input type="text" name="email" size="45"
+                               value="<c:out value='${user.email}' />"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Password:</th>
+                    <td>
+                        <input type="text" name="password" size="45"
+                               value="<c:out value='${user.password}' />"
+                        />
+                    </td>
+                </tr>
+                <tr>
                     <th>First Name:</th>
                     <td>
                         <input type="text" name="first_name" size="45"
@@ -52,14 +69,6 @@
                     <td>
                         <input type="text" name="last_name" size="45"
                                value="<c:out value='${user.lastName}' />"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <th>User Email:</th>
-                    <td>
-                        <input type="text" name="email" size="45"
-                               value="<c:out value='${user.email}' />"
                         />
                     </td>
                 </tr>

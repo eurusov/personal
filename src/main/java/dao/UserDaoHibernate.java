@@ -32,16 +32,32 @@ public class UserDaoHibernate implements UserDao {
         return query.list();
     }
 
+    /* Updates only fields that are not null in updatedUser */
     @Override
     public boolean updateUser(User updatedUser) {
-        User existingUser = (User) session.get(User.class, updatedUser.getId());
-        if (existingUser == null) {
+        User oldUser = (User) session.get(User.class, updatedUser.getId());
+        if (oldUser == null) {
             return false;
         }
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setCountry(updatedUser.getCountry());
+        String param;
+        if ((param = updatedUser.getEmail()) != null) {
+            oldUser.setEmail(param);
+        }
+        if ((param = updatedUser.getPassword()) != null) {
+            oldUser.setPassword(param);
+        }
+        if ((param = updatedUser.getFirstName()) != null) {
+            oldUser.setFirstName(param);
+        }
+        if ((param = updatedUser.getLastName()) != null) {
+            oldUser.setLastName(param);
+        }
+        if ((param = updatedUser.getCountry()) != null) {
+            oldUser.setCountry(param);
+        }
+        if ((param = updatedUser.getRole()) != null) {
+            oldUser.setRole(param);
+        }
         return true;
     }
 

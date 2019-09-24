@@ -15,24 +15,28 @@ public class UserDaoJdbc implements UserDao {
     private Connection connection;
 
     private static final String COL_ID = "id";
+    private static final String COL_PSW = "password";
+    private static final String COL_EMAIL = "email";
     private static final String COL_FIRST_NAME = "first_name";
     private static final String COL_LAST_NAME = "last_name";
-    private static final String COL_EMAIL = "email";
     private static final String COL_COUNTRY = "country";
+    private static final String COL_ROLE = "role";
 
     public UserDaoJdbc(Connection connection) {
         this.connection = connection;
     }
 
+    /* User role field always ignored and setting up to 'user' */
     @Override
     public Long addUser(User user) throws DBException {
         try (PreparedStatement prepStmtInsert = connection.prepareStatement(StringConst.SQL_INSERT);
              PreparedStatement prepStmtGetId = connection.prepareStatement(StringConst.SQL_GET_ID_BY_EMAIL)
         ) {
             int idx = 0;
+            prepStmtInsert.setString(++idx, user.getEmail());
+            prepStmtInsert.setString(++idx, user.getPassword());
             prepStmtInsert.setString(++idx, user.getFirstName());
             prepStmtInsert.setString(++idx, user.getLastName());
-            prepStmtInsert.setString(++idx, user.getEmail());
             prepStmtInsert.setString(++idx, user.getCountry());
             prepStmtInsert.executeUpdate();
             prepStmtGetId.setString(1, user.getEmail());
@@ -46,9 +50,16 @@ public class UserDaoJdbc implements UserDao {
         }
     }
 
+    /* Get user by id */
     @Override
     public User getUser(Long id) throws DBException {
         return getUserBySqlQuery(StringConst.SQL_GET_BY_ID, id.toString());
+    }
+
+    /* Get user by email and password */
+    @Override
+    public User getUser(String email, String password) throws DBException {
+        return getUserBySqlQuery(StringConst.SQL_GET_BY_EMAIL_PSW, email, password);
     }
 
     @Override
@@ -59,10 +70,12 @@ public class UserDaoJdbc implements UserDao {
             while (result.next()) {
                 User user = new User(
                         result.getLong(COL_ID),
+                        result.getString(COL_EMAIL),
+                        result.getString(COL_PSW),
                         result.getString(COL_FIRST_NAME),
                         result.getString(COL_LAST_NAME),
-                        result.getString(COL_EMAIL),
-                        result.getString(COL_COUNTRY)
+                        result.getString(COL_COUNTRY),
+                        result.getString(COL_ROLE)
                 );
                 userList.add(user);
             }
@@ -76,9 +89,10 @@ public class UserDaoJdbc implements UserDao {
     public boolean updateUser(User user) throws DBException {
         try (PreparedStatement prepStmt = connection.prepareStatement(StringConst.SQL_UPDATE)) {
             int idx = 0;
+            prepStmt.setString(++idx, user.getEmail());
+            prepStmt.setString(++idx, user.getPassword());
             prepStmt.setString(++idx, user.getFirstName());
             prepStmt.setString(++idx, user.getLastName());
-            prepStmt.setString(++idx, user.getEmail());
             prepStmt.setString(++idx, user.getCountry());
             prepStmt.setLong(++idx, user.getId());
             return prepStmt.executeUpdate() == 1;
@@ -95,11 +109,6 @@ public class UserDaoJdbc implements UserDao {
         } catch (SQLException e) {
             throw new DBException(e);
         }
-    }
-
-    @Override
-    public User getUser(String email, String password) throws DBException {
-        return getUserBySqlQuery(StringConst.SQL_GET_BY_EMAIL_PSW, email, password);
     }
 
     /**
@@ -128,10 +137,12 @@ public class UserDaoJdbc implements UserDao {
             }
             return new User(
                     resultSet.getLong(COL_ID),
+                    resultSet.getString(COL_EMAIL),
+                    resultSet.getString(COL_PSW),
                     resultSet.getString(COL_FIRST_NAME),
                     resultSet.getString(COL_LAST_NAME),
-                    resultSet.getString(COL_EMAIL),
-                    resultSet.getString(COL_COUNTRY)
+                    resultSet.getString(COL_COUNTRY),
+                    resultSet.getString(COL_ROLE)
             );
         } catch (SQLException e) {
             throw new DBException(e);

@@ -13,7 +13,7 @@
 </head>
 <body>
 <div style="text-align: center;">
-    <h1>User Management</h1>
+    <h1>Login</h1>
 </div>
 <div align="center">
     <form action="login" method="post">
@@ -29,7 +29,7 @@
             <tr>
                 <th>Password:</th>
                 <td>
-                    <input type="text" name="password" size="45"
+                    <input type="password" name="password" size="45"
                            value="<c:out value='${user.password}' />"
                     />
                 </td>
@@ -45,7 +45,8 @@
 </div>
 <div style="text-align: center;">
     <h4>
-        <a href="list">List All Users</a>
+        Don’t have an account <a href="new">Sign up now</a>
+<%--        <a href="list">List All Users</a>--%>
     </h4>
 </div>
 </body>

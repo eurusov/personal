@@ -9,35 +9,38 @@ public class User {
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String password;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "email", nullable = false)
     private String email;
+    @Column(name = "password", nullable = false)
+    private String password;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+    @Column(name = "country", nullable = false)
     private String country;
+    @Column(name = "role")
     private String role;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String country) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.country = country;
-    }
-
-    public User(Long id, String firstName, String lastName, String email, String country) {
+    public User(Long id, String email, String password, String firstName, String lastName, String country, String role) {
         this.id = id;
+        this.email = email;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
         this.country = country;
+        this.role = (role == null) ? "user" : role;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getFirstName() {
@@ -48,12 +51,12 @@ public class User {
         return lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getCountry() {
         return country;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public void setFirstName(String firstName) {
@@ -70,6 +73,18 @@ public class User {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

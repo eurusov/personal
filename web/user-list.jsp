@@ -14,19 +14,23 @@
         <caption><h2>List of Users</h2></caption>
         <tr>
             <th>ID</th>
+            <th>E-mail</th>
+            <th>Password</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Email</th>
             <th>Country</th>
+            <th>User role</th>
             <th>Actions</th>
         </tr>
         <c:forEach var="user" items="${listUser}">
             <tr>
                 <td><c:out value="${user.id}"/></td>
+                <td><c:out value="${user.email}"/></td>
+                <td><c:out value="${user.password}"/></td>
                 <td><c:out value="${user.firstName}"/></td>
                 <td><c:out value="${user.lastName}"/></td>
-                <td><c:out value="${user.email}"/></td>
                 <td><c:out value="${user.country}"/></td>
+                <td><c:out value="${user.role}"/></td>
                 <td>
                     <a href="edit?id=<c:out value='${user.id}' />">Edit</a>
                     &nbsp;&nbsp;&nbsp;&nbsp;
