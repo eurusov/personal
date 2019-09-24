@@ -69,7 +69,15 @@ public class UserServlet extends HttpServlet {
 //        System.out.println("password: " + password);
         User user = userService.getUser(email, password);
         if (user != null) {
-            listUser(request, response);
+            if (user.getRole().equals("admin")) {
+                listUser(request, response);
+            } else {
+                RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+                request.setAttribute("user", user);
+                dispatcher.forward(request, response);
+
+            }
+
         }
     }
 
