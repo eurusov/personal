@@ -1,0 +1,48 @@
+body {
+    /*font-family: 'Source Sans Pro', sans-serif;*/
+    margin: 0;
+    padding: 0;
+}
+
+body, form, input {
+    font-family: 'IBM Plex Sans', sans-serif;
+    /*font-size: medium;*/
+    font-size: initial;
+}
+
+header {
+    color: white;
+    background-color: dimgray;
+    margin: 0;
+    padding: 1px;
+    height: 83px;
+}
+
+.content {
+    width: 1180px;
+    margin-left: 120px;
+}
+
+#header_text {
+    float: left;
+    padding: 0;
+    margin: 36px 0 0;
+}
+
+.link_button {
+    float: right;
+    margin-top: 26px;
+    width: 135px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    background-color: #48a34b;
+    border-radius: 2px;
+    text-transform: uppercase;
+}
+
+.link_button:hover {
+    background-color: #5fd461;
+}

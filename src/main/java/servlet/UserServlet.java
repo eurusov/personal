@@ -19,14 +19,17 @@ public class UserServlet extends HttpServlet {
 
     private UserService userService;
 
+    @Override
     public void init() {
         if (userService == null) {
             userService = new UserService(DBService.getUserDaoCreator());
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
+
         try {
             switch (action) {
                 case "/insert":
@@ -45,6 +48,7 @@ public class UserServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getServletPath();
 
