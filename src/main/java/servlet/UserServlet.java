@@ -26,7 +26,23 @@ public class UserServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
+        String action = request.getServletPath();
+        try {
+            switch (action) {
+                case "/insert":
+                    insertUser(request, response);
+                    break;
+                case "/update":
+                    updateUser(request, response);
+                    break;
+                case "/login":
+                    doLogin(request, response);
+                default:
+                    doGet(request, response);
+            }
+        } catch (DBException e) {
+            throw new ServletException(e);
+        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -37,24 +53,16 @@ public class UserServlet extends HttpServlet {
                 case "/new":
                     showNewForm(request, response);
                     break;
-                case "/insert":
-                    insertUser(request, response);
-                    break;
                 case "/delete":
                     deleteUser(request, response);
                     break;
                 case "/edit":
                     showEditForm(request, response);
                     break;
-                case "/update":
-                    updateUser(request, response);
-                    break;
                 case "/list":
                     listUser(request, response);
-                case "/login":
-                    doLogin(request, response);
                 default:
-                    login(request, response);
+                    showLoginForm(request, response);
                     break;
             }
         } catch (DBException e) {
@@ -65,23 +73,19 @@ public class UserServlet extends HttpServlet {
     private void doLogin(HttpServletRequest request, HttpServletResponse response) throws DBException, IOException, ServletException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-//        System.out.println("email: " + email);
-//        System.out.println("password: " + password);
         User user = userService.getUser(email, password);
         if (user != null) {
             if (user.getRole().equals("admin")) {
                 listUser(request, response);
             } else {
-                RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("user-page.jsp");
                 request.setAttribute("user", user);
                 dispatcher.forward(request, response);
-
             }
-
         }
     }
 
-    private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void showLoginForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
         dispatcher.forward(request, response);
     }
@@ -96,7 +100,7 @@ public class UserServlet extends HttpServlet {
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("edit-form.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -104,7 +108,7 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException, DBException {
         Long id = Long.valueOf(request.getParameter("id"));
         User existingUser = userService.getUser(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("user-form.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("edit-form.jsp");
         request.setAttribute("user", existingUser);
         dispatcher.forward(request, response);
     }
