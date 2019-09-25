@@ -117,11 +117,11 @@
             <input type="text" id="email" name="email" size="45"
                    value="<c:out value='${user.email}'/>"
             >
-            <label for="fname">Password</label>
+            <label for="password">Password</label>
             <input type="text" id="password" name="password" size="45"
                    value="<c:out value='${user.password}'/>"
             >
-            <label for="password">First name</label>
+            <label for="fname">First name</label>
             <input type="text" id="fname" name="first_name" size="45"
                    value="<c:out value='${user.firstName}'/>"
             >
@@ -138,9 +138,9 @@
     </div>
 </div>
 <div class="outer">
-    <h4>
+    <p>
         <a href="list">List All Users</a>
-    </h4>
+    </p>
 </div>
 </body>
 </html>
