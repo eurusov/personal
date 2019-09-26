@@ -85,34 +85,23 @@ public class UserServlet extends HttpServlet {
     }
 
     private void userEntryPoint(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, DBException {
-        HttpSession httpSession = req.getSession();
-        User loggedUser = (User) httpSession.getAttribute("loggedUser");
+        User loggedUser = (User) req.getSession().getAttribute("loggedUser");
         if (loggedUser == null) {
             showLoginForm(req, resp);
         } else if (loggedUser.getRole().equals("admin")) {
             showUserListForm(req, resp);
         } else {
-//            req.setAttribute("user", loggedUser);
             showUserWelcomeForm(req, resp);
         }
     }
 
     private void doLogin(HttpServletRequest req, HttpServletResponse resp) throws DBException, IOException, ServletException {
-
-        HttpSession httpSession = req.getSession();
-//        httpSession.removeAttribute("loggedUser"); // clean up httpSession
-//        request.removeAttribute("user"); // cleanup request
-
         String email = req.getParameter("email");
         String password = req.getParameter("password");
         User user = userService.getUser(email, password);
         if (user != null) {
-            httpSession.setAttribute("loggedUser", user); // save loggedUser in httpSession
-            if (user.getRole().equals("admin")) {
-                showUserListForm(req, resp);
-            } else {
-                showUserWelcomeForm(req, resp);
-            }
+            req.getSession().setAttribute("loggedUser", user); // save loggedUser in httpSession
+            userEntryPoint(req, resp);
         }
     }
 
@@ -128,8 +117,7 @@ public class UserServlet extends HttpServlet {
 
     private void showUserListForm(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, DBException {
-        HttpSession httpSession = request.getSession();
-        User loggedUser = (User) httpSession.getAttribute("loggedUser");
+        User loggedUser = (User) request.getSession().getAttribute("loggedUser");
         if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(request, response);
         } else if (!loggedUser.getRole().equals("admin")) {

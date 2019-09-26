@@ -9,35 +9,31 @@
     <style>
         <%@include file="general.css"%>
 
-        #footer_text {
-            margin-top: 36px;
-        }
-
         #table_caption {
             text-align: left;
             text-transform: uppercase;
         }
 
-        #users {
+        #user_table {
             margin-top: 30px;
             border-collapse: collapse;
             width: 480px;
         }
 
-        #users td, #users th {
+        #user_table td, #user_table th {
             border: 1px solid #ddd;
             padding: 8px;
         }
 
-        #users tr:nth-child(even) {
+        #user_table tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
-        #users tr:hover {
+        #user_table tr:hover {
             background-color: #ddd;
         }
 
-        #users th {
+        #user_table th {
             padding-top: 12px;
             padding-bottom: 12px;
             text-align: left;
@@ -55,7 +51,6 @@
     </style>
 </head>
 <body>
-<%--<jsp:useBean id="user" scope="request" class="model.User"/>--%>
 <jsp:useBean id="loggedUser" scope="session" class="model.User"/>
 <header>
     <div class="content">
@@ -66,7 +61,7 @@
     </div>
 </header>
 <div class="content">
-    <table id="users">
+    <table id="user_table">
         <caption><p id="table_caption">Your profile details:</p></caption>
         <tr>
             <td class="field_name">E-mail:</td>
