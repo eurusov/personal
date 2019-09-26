@@ -27,21 +27,21 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getServletPath();
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getServletPath();
 
         try {
             switch (action) {
                 case "/insert":
-                    insertUser(request, response);
+                    insertUserIntoDB(req, resp);
                     break;
                 case "/update":
-                    updateUser(request, response);
+                    updateUserInDB(req, resp);
                     break;
                 case "/login":
-                    doLogin(request, response);
+                    doLogin(req, resp);
                 default:
-                    doGet(request, response);
+                    doGet(req, resp);
             }
         } catch (DBException e) {
             throw new ServletException(e);
@@ -49,28 +49,28 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getServletPath();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String action = req.getServletPath();
 
         try {
             switch (action) {
                 case "/new":
-                    showNewForm(request, response);
+                    showNewForm(req, resp);
                     break;
                 case "/delete":
-                    deleteUser(request, response);
+                    deleteUserFromDB(req, resp);
                     break;
                 case "/edit":
-                    showEditForm(request, response);
+                    showEditForm(req, resp);
                     break;
                 case "/list":
-                    showUserListForm(request, response);
+                    showUserListForm(req, resp);
                     break;
                 case "/logout":
-                    doLogout(request, response);
+                    doLogout(req, resp);
                     break;
                 default:
-                    userEntryPoint(request, response);
+                    userEntryPoint(req, resp);
                     break;
             }
         } catch (DBException e) {
@@ -78,14 +78,15 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getSession().invalidate();
-        showLoginForm(request, response);
+    private void doLogout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getSession().invalidate();
+        showLoginForm(req, resp);
     }
 
     private void userEntryPoint(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, DBException {
         User loggedUser = (User) req.getSession().getAttribute("loggedUser");
-        if (loggedUser == null) {
+        System.out.println(loggedUser);
+        if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(req, resp);
         } else if (loggedUser.getRole().equals("admin")) {
             showUserListForm(req, resp);
@@ -109,80 +110,75 @@ public class UserServlet extends HttpServlet {
         dispatcher.forward(req, resp);
     }
 
-    private void showLoginForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("login.jsp");
-        dispatcher.forward(request, response);
+    private void showLoginForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        RequestDispatcher dispatcher = req.getRequestDispatcher("login.jsp");
+        dispatcher.forward(req, resp);
     }
 
-    private void showUserListForm(HttpServletRequest request, HttpServletResponse response)
+    private void showUserListForm(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException, DBException {
-        User loggedUser = (User) request.getSession().getAttribute("loggedUser");
+        User loggedUser = (User) req.getSession().getAttribute("loggedUser");
         if (loggedUser == null || loggedUser.getId() == null) {
-            showLoginForm(request, response);
+            showLoginForm(req, resp);
         } else if (!loggedUser.getRole().equals("admin")) {
-            showUserWelcomeForm(request, response);
+            showUserWelcomeForm(req, resp);
         } else {
             List<User> listUser = userService.getAllUser();
-            request.setAttribute("listUser", listUser);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("user-list.jsp");
-            dispatcher.forward(request, response);
+            req.setAttribute("listUser", listUser);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("user-list.jsp");
+            dispatcher.forward(req, resp);
         }
     }
 
-    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
+    private void showNewForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("edit-form.jsp");
-        dispatcher.forward(request, response);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("edit-form.jsp");
+        dispatcher.forward(req, resp);
     }
 
-    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+    private void showEditForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException, DBException {
-        Long id = Long.valueOf(request.getParameter("id"));
+        Long id = Long.valueOf(req.getParameter("id"));
         User existingUser = userService.getUser(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("edit-form.jsp");
-        request.setAttribute("user", existingUser);
-        dispatcher.forward(request, response);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("edit-form.jsp");
+        req.setAttribute("user", existingUser);
+        dispatcher.forward(req, resp);
     }
 
-    private void insertUser(HttpServletRequest request, HttpServletResponse response)
+    private void insertUserIntoDB(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, DBException {
-        userService.addUser(getUserFromRequest(request));
-        response.sendRedirect("list");
+        userService.addUser(getUserFromRequestParam(req));
+        resp.sendRedirect("");
     }
 
-    private void updateUser(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, DBException, ServletException {
-        User updatedUser = getUserFromRequest(req);
+    private void updateUserInDB(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, DBException {
+        User updatedUser = getUserFromRequestParam(req);
         User loggedUser = (User) req.getSession().getAttribute("loggedUser");
         if (userService.updateUser(updatedUser)) {
             if (updatedUser.getId().equals(loggedUser.getId())) {
                 req.getSession().setAttribute("loggedUser", updatedUser);
             }
         }
-        userEntryPoint(req, resp);
-//        if (loggedUser.getRole().equals("admin")) {
-//            response.sendRedirect("list");
-//        } else {
-//            response.sendRedirect("");
-//        }
+        resp.sendRedirect("");
     }
 
-    private void deleteUser(HttpServletRequest request, HttpServletResponse response)
+    private void deleteUserFromDB(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, DBException {
-        Long id = Long.valueOf(request.getParameter("id"));
+        Long id = Long.valueOf(req.getParameter("id"));
         userService.deleteUser(id);
-        response.sendRedirect("list");
+        resp.sendRedirect("list"); // TODO: add ability to user delete himself and change "list" to "" here
     }
 
-    private User getUserFromRequest(HttpServletRequest request) {
-        String idStr = request.getParameter("id");
+    private User getUserFromRequestParam(HttpServletRequest req) {
+        String idStr = req.getParameter("id");
         Long id = (idStr == null) ? null : Long.valueOf(idStr);
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String firstName = request.getParameter("first_name");
-        String lastName = request.getParameter("last_name");
-        String country = request.getParameter("country");
-        String role = request.getParameter("role");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+        String firstName = req.getParameter("first_name");
+        String lastName = req.getParameter("last_name");
+        String country = req.getParameter("country");
+        String role = req.getParameter("role");
         return new User(id, email, password, firstName, lastName, country, role);
     }
 }
