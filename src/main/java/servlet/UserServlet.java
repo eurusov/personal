@@ -11,7 +11,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -151,20 +150,21 @@ public class UserServlet extends HttpServlet {
         response.sendRedirect("list");
     }
 
-    private void updateUser(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, DBException {
-        User updatedUser = getUserFromRequest(request);
-        User loggedUser = (User) request.getSession().getAttribute("loggedUser");
+    private void updateUser(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, DBException, ServletException {
+        User updatedUser = getUserFromRequest(req);
+        User loggedUser = (User) req.getSession().getAttribute("loggedUser");
         if (userService.updateUser(updatedUser)) {
             if (updatedUser.getId().equals(loggedUser.getId())) {
-                request.getSession().setAttribute("loggedUser", updatedUser);
+                req.getSession().setAttribute("loggedUser", updatedUser);
             }
         }
-        if (loggedUser.getRole().equals("admin")) {
-            response.sendRedirect("list");
-        } else {
-            response.sendRedirect("");
-        }
+        userEntryPoint(req, resp);
+//        if (loggedUser.getRole().equals("admin")) {
+//            response.sendRedirect("list");
+//        } else {
+//            response.sendRedirect("");
+//        }
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
