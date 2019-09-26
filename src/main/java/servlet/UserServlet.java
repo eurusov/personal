@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -64,9 +65,13 @@ public class UserServlet extends HttpServlet {
                     showEditForm(request, response);
                     break;
                 case "/list":
-                    listUser(request, response);
+                    showUserListForm(request, response);
+                    break;
+                case "/logout":
+                    doLogout(request, response);
+                    break;
                 default:
-                    showLoginForm(request, response);
+                    userEntryPoint(request, response);
                     break;
             }
         } catch (DBException e) {
@@ -74,19 +79,46 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private void doLogin(HttpServletRequest request, HttpServletResponse response) throws DBException, IOException, ServletException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+    private void doLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().invalidate();
+        showLoginForm(request, response);
+    }
+
+    private void userEntryPoint(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, DBException {
+        HttpSession httpSession = req.getSession();
+        User loggedUser = (User) httpSession.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            showLoginForm(req, resp);
+        } else if (loggedUser.getRole().equals("admin")) {
+            showUserListForm(req, resp);
+        } else {
+//            req.setAttribute("user", loggedUser);
+            showUserWelcomeForm(req, resp);
+        }
+    }
+
+    private void doLogin(HttpServletRequest req, HttpServletResponse resp) throws DBException, IOException, ServletException {
+
+        HttpSession httpSession = req.getSession();
+//        httpSession.removeAttribute("loggedUser"); // clean up httpSession
+//        request.removeAttribute("user"); // cleanup request
+
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
         User user = userService.getUser(email, password);
         if (user != null) {
+            httpSession.setAttribute("loggedUser", user); // save loggedUser in httpSession
             if (user.getRole().equals("admin")) {
-                listUser(request, response);
+                showUserListForm(req, resp);
             } else {
-                RequestDispatcher dispatcher = request.getRequestDispatcher("user-page.jsp");
-                request.setAttribute("user", user);
-                dispatcher.forward(request, response);
+                showUserWelcomeForm(req, resp);
             }
         }
+    }
+
+    private void showUserWelcomeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        RequestDispatcher dispatcher = req.getRequestDispatcher("user-page.jsp");
+        dispatcher.forward(req, resp);
     }
 
     private void showLoginForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -94,12 +126,20 @@ public class UserServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
-    private void listUser(HttpServletRequest request, HttpServletResponse response)
+    private void showUserListForm(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException, DBException {
-        List<User> listUser = userService.getAllUser();
-        request.setAttribute("listUser", listUser);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("user-list.jsp");
-        dispatcher.forward(request, response);
+        HttpSession httpSession = request.getSession();
+        User loggedUser = (User) httpSession.getAttribute("loggedUser");
+        if (loggedUser == null) {
+            showLoginForm(request, response);
+        } else if (!loggedUser.getRole().equals("admin")) {
+            showEditForm(request, response);
+        } else {
+            List<User> listUser = userService.getAllUser();
+            request.setAttribute("listUser", listUser);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("user-list.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response)
@@ -125,8 +165,18 @@ public class UserServlet extends HttpServlet {
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response)
             throws IOException, DBException {
-        userService.updateUser(getUserFromRequest(request));
-        response.sendRedirect("list");
+        User updatedUser = getUserFromRequest(request);
+        User loggedUser = (User) request.getSession().getAttribute("loggedUser");
+        if (userService.updateUser(updatedUser)) {
+            if (updatedUser.getId().equals(loggedUser.getId())) {
+                request.getSession().setAttribute("loggedUser", updatedUser);
+            }
+        }
+        if (loggedUser.getRole().equals("admin")) {
+            response.sendRedirect("list");
+        } else {
+            response.sendRedirect("");
+        }
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)

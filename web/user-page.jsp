@@ -7,99 +7,82 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        footer {
-            text-align: left;
-            color: white;
-            background-color: #86a1bd;
-            margin: 0;
-            padding: 1px;
-            height: 83px;
-        }
+        <%@include file="general.css"%>
 
         #footer_text {
             margin-top: 36px;
         }
 
         #table_caption {
-            color: slategrey;
             text-align: left;
+            text-transform: uppercase;
         }
 
-        .outer {
-            margin-left: 120px;
-        }
-
-        table {
-            width: 34em;
-        }
-
-        table, td {
-            color: darkslategray;
-            background: #edf1f5;
-            border: 2px solid white;
+        #users {
+            margin-top: 30px;
             border-collapse: collapse;
-            padding: 10px;
+            width: 480px;
+        }
+
+        #users td, #users th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #users tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #users tr:hover {
+            background-color: #ddd;
+        }
+
+        #users th {
+            padding-top: 12px;
+            padding-bottom: 12px;
             text-align: left;
+            background-color: #4CAF50;
+            color: white;
         }
 
         .field_name {
-            width: 6em;
-            color: slategrey;
-            background: #edf1f5;
+            width: 120px;
         }
 
-        #link {
-            padding-top: 20px;
-        }
-
-        a:link, a:visited {
-            background-color: #98b7d4;
-            color: white;
-            padding: 12px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        a:hover, a:active {
-            background-color: #369cf5;
+        #edit_link {
+            float: left;
         }
     </style>
 </head>
 <body>
-<jsp:useBean id="user" scope="request" class="model.User"/>
-<footer>
-    <h1 class="outer" id="footer_text">Welcome, <c:out value='${user.firstName}'/></h1>
-</footer>
-<div class="outer">
-    <table>
-        <caption><h3 id="table_caption">Your profile details:</h3></caption>
+<%--<jsp:useBean id="user" scope="request" class="model.User"/>--%>
+<jsp:useBean id="loggedUser" scope="session" class="model.User"/>
+<header>
+    <div class="content">
+        <h1 id="footer_text">Welcome, <c:out value='${loggedUser.firstName}'/></h1>
+    </div>
+</header>
+<div class="content">
+    <table id="users">
+        <caption><p id="table_caption">Your profile details:</p></caption>
         <tr>
             <td class="field_name">E-mail:</td>
-            <td><c:out value="${user.email}"/></td>
+            <td><c:out value="${loggedUser.email}"/></td>
         </tr>
         <tr>
             <td class="field_name">First name:</td>
-            <td><c:out value="${user.firstName}"/></td>
+            <td><c:out value="${loggedUser.firstName}"/></td>
         </tr>
         <tr>
             <td class="field_name">Last name:</td>
-            <td><c:out value="${user.lastName}"/></td>
+            <td><c:out value="${loggedUser.lastName}"/></td>
         </tr>
         <tr>
             <td class="field_name">Country:</td>
-            <td><c:out value="${user.country}"/></td>
+            <td><c:out value="${loggedUser.country}"/></td>
         </tr>
     </table>
-</div>
-<div class="outer" id="link">
-    <a href="edit?id=<c:out value='${user.id}' />">Edit profile</a>
+    <a id="edit_link" class="link_button" href="edit?id=<c:out value='${loggedUser.id}' />">Edit profile</a>
 </div>
 </body>
 </html>

@@ -38,6 +38,7 @@
     <form action="<c:out value='${action}'/>" method="post">
         <c:if test="${user.id != null}">
             <input type="hidden" name="id" value="<c:out value='${user.id}'/>"/>
+            <input type="hidden" name="role" value="<c:out value='${user.role}'/>"/>
         </c:if>
         <label>E-mail
             <input type="text" name="email" size="60"
