@@ -19,18 +19,28 @@
 <body>
 
 <jsp:useBean id="user" scope="request" class="model.User"/>
+<jsp:useBean id="loggedUser" scope="session" class="model.User"/>
 
 <c:set var="title" value="Register new user"/>
 <c:set var="action" value="insert"/>
+<c:set var="btm_text" value="Back to Login"/>
 <c:if test="${user.id != null}">
     <c:set var="title" value="Edit user"/>
     <c:set var="action" value="update"/>
+</c:if>
+<c:if test="${loggedUser.role != null}">
+    <c:set var="btm_text" value="User info"/>
+</c:if>
+<c:if test="${loggedUser.role.equals('admin')}">
+    <c:set var="btm_text" value="User list"/>
 </c:if>
 
 <header>
     <div class="content">
         <h1 id="header_text"><c:out value='${title}'/></h1>
-        <a id="logout_link" class="link_button" href="logout">Logout</a>
+        <c:if test="${loggedUser.id != null}">
+            <a id="logout_link" class="link_button" href="logout">Logout</a>
+        </c:if>
     </div>
 </header>
 
@@ -62,7 +72,7 @@
         </label>
         <input type="submit" value="save">
     </form>
-    <a id="bottom_link" class="link_button" href="list">LIST OF USERS</a>
+    <a id="bottom_link" class="link_button" href="list"><c:out value="${btm_text}"/></a>
 </div>
 </body>
 </html>

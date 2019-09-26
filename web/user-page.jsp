@@ -59,7 +59,10 @@
 <jsp:useBean id="loggedUser" scope="session" class="model.User"/>
 <header>
     <div class="content">
-        <h1 id="footer_text">Welcome, <c:out value='${loggedUser.firstName}'/></h1>
+        <h1 id="header_text">Welcome, <c:out value='${loggedUser.firstName}'/></h1>
+        <c:if test="${loggedUser.id != null}">
+            <a id="logout_link" class="link_button" href="logout">Logout</a>
+        </c:if>
     </div>
 </header>
 <div class="content">

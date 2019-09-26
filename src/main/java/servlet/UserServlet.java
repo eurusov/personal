@@ -130,10 +130,10 @@ public class UserServlet extends HttpServlet {
             throws IOException, ServletException, DBException {
         HttpSession httpSession = request.getSession();
         User loggedUser = (User) httpSession.getAttribute("loggedUser");
-        if (loggedUser == null) {
+        if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(request, response);
         } else if (!loggedUser.getRole().equals("admin")) {
-            showEditForm(request, response);
+            showUserWelcomeForm(request, response);
         } else {
             List<User> listUser = userService.getAllUser();
             request.setAttribute("listUser", listUser);
