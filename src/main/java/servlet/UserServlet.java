@@ -6,6 +6,7 @@ import service.UserService;
 import util.DBService;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +23,7 @@ public class UserServlet extends HttpServlet {
     @Override
     public void init() {
         if (userService == null) {
-            userService = new UserService(DBService.getUserDaoCreator());
+            userService = UserService.getInstance(DBService.getUserDaoCreator());
         }
     }
 
@@ -64,9 +65,6 @@ public class UserServlet extends HttpServlet {
                 case "/edit":
                     showEditForm(req, resp);
                     break;
-                case "/list":
-                    showUserListForm(req, resp);
-                    break;
                 case "/logout":
                     doLogout(req, resp);
                     break;
@@ -89,7 +87,9 @@ public class UserServlet extends HttpServlet {
         if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(req, resp);
         } else if (loggedUser.getRole().equals("admin")) {
-            showUserListForm(req, resp);
+            resp.sendRedirect(req.getContextPath()+"/list");
+//            RequestDispatcher dispatcher = req.getRequestDispatcher("/list");
+//            dispatcher.forward(req, resp);
         } else {
             showUserWelcomeForm(req, resp);
         }
@@ -113,21 +113,6 @@ public class UserServlet extends HttpServlet {
     private void showLoginForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RequestDispatcher dispatcher = req.getRequestDispatcher("login.jsp");
         dispatcher.forward(req, resp);
-    }
-
-    private void showUserListForm(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, ServletException, DBException {
-        User loggedUser = (User) req.getSession().getAttribute("loggedUser");
-        if (loggedUser == null || loggedUser.getId() == null) {
-            showLoginForm(req, resp);
-        } else if (!loggedUser.getRole().equals("admin")) {
-            showUserWelcomeForm(req, resp);
-        } else {
-            List<User> listUser = userService.getAllUser();
-            req.setAttribute("listUser", listUser);
-            RequestDispatcher dispatcher = req.getRequestDispatcher("user-list.jsp");
-            dispatcher.forward(req, resp);
-        }
     }
 
     private void showNewForm(HttpServletRequest req, HttpServletResponse resp)

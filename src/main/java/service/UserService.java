@@ -11,11 +11,19 @@ import java.util.List;
 public class UserService {
 
     private static UserDaoCreator userDaoCreator;
+    private static UserService instance;
 
-    public UserService(UserDaoCreator userDaoCreator) {
+    private UserService(UserDaoCreator userDaoCreator) {
         if (UserService.userDaoCreator == null) {
             UserService.userDaoCreator = userDaoCreator;
         }
+    }
+
+    public static UserService getInstance(UserDaoCreator userDaoCreator) {
+        if (instance == null) {
+            instance = new UserService(userDaoCreator);
+        }
+        return instance;
     }
 
     @SuppressWarnings("unchecked")
