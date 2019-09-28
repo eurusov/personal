@@ -40,6 +40,7 @@ public class UserServlet extends HttpServlet {
                     break;
                 case "/login":
                     doLogin(req, resp);
+                    break;
                 default:
                     doGet(req, resp);
             }
@@ -85,7 +86,6 @@ public class UserServlet extends HttpServlet {
 
     private void userEntryPoint(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, DBException {
         User loggedUser = (User) req.getSession().getAttribute("loggedUser");
-        System.out.println(loggedUser);
         if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(req, resp);
         } else if (loggedUser.getRole().equals("admin")) {
