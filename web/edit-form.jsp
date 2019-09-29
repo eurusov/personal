@@ -26,7 +26,7 @@
 <c:set var="btm_text" value="Back to Login"/>
 <c:if test="${user.id != null}">
     <c:set var="title" value="Edit user"/>
-    <c:set var="action" value="update"/>
+    <c:set var="action" value="edit"/>
 </c:if>
 <c:if test="${loggedUser.role != null}">
     <c:set var="btm_text" value="User info"/>

@@ -22,9 +22,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void init() {
-        if (userService == null) {
-            userService = UserService.getInstance(DBService.getUserDaoCreator());
-        }
+        userService = UserService.getInstance(DBService.getUserDaoCreator());
     }
 
     @Override
@@ -35,9 +33,6 @@ public class UserServlet extends HttpServlet {
             switch (action) {
                 case "/insert":
                     insertUserIntoDB(req, resp);
-                    break;
-                case "/update":
-                    updateUserInDB(req, resp);
                     break;
                 case "/login":
                     doLogin(req, resp);
@@ -87,7 +82,7 @@ public class UserServlet extends HttpServlet {
         if (loggedUser == null || loggedUser.getId() == null) {
             showLoginForm(req, resp);
         } else if (loggedUser.getRole().equals("admin")) {
-            resp.sendRedirect(req.getContextPath()+"/list");
+            resp.sendRedirect(req.getContextPath() + "/list");
 //            RequestDispatcher dispatcher = req.getRequestDispatcher("/list");
 //            dispatcher.forward(req, resp);
         } else {
@@ -133,18 +128,6 @@ public class UserServlet extends HttpServlet {
     private void insertUserIntoDB(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, DBException {
         userService.addUser(getUserFromRequestParam(req));
-        resp.sendRedirect("");
-    }
-
-    private void updateUserInDB(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, DBException {
-        User updatedUser = getUserFromRequestParam(req);
-        User loggedUser = (User) req.getSession().getAttribute("loggedUser");
-        if (userService.updateUser(updatedUser)) {
-            if (updatedUser.getId().equals(loggedUser.getId())) {
-                req.getSession().setAttribute("loggedUser", updatedUser);
-            }
-        }
         resp.sendRedirect("");
     }
 

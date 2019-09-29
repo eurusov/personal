@@ -1,6 +1,6 @@
 package service;
 
-public class DBException extends Exception {
+public class DBException extends RuntimeException {
     public DBException(Throwable throwable) {
         super(throwable);
     }
