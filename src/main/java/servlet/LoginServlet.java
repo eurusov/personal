@@ -35,6 +35,8 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             req.getSession().setAttribute("loggedUser", user); // save loggedUser in httpSession
             resp.sendRedirect(req.getContextPath());
+        } else {
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 }
