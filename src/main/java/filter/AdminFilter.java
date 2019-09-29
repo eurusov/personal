@@ -1,4 +1,4 @@
-package servlet;
+package filter;
 
 import model.User;
 
@@ -17,6 +17,12 @@ public class AdminFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         User loggedUser = (User) req.getSession().getAttribute("loggedUser");
+
+        /* Проверим, что в случае delete параметр id парсится в Long */
+        String action = req.getServletPath();
+        if (action.equals("/delete") && FilterUtil.getIdOrNullAndBadRequest(req, resp) == null) {
+            return;
+        }
 
         /* Если пользователь вошел в систему и он админ */
         if (loggedUser != null && loggedUser.getRole() != null && loggedUser.getRole().equals("admin")) {

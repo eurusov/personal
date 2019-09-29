@@ -1,11 +1,11 @@
-package servlet;
+package filter;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
- * Без этого русские буквы при редактировании и добавлении становятся кракозябрами
+ * Без этого русские буквы при редактировании и добавлении становятся кракозябрами.
  */
 
 @WebFilter(filterName = "CharacterSetFilter", urlPatterns = {"/*"})

@@ -1,4 +1,4 @@
-package servlet;
+package filter;
 
 import model.User;
 
@@ -24,12 +24,9 @@ public class EditFilter implements Filter {
         }
         String role = loggedUser.getRole();
 
-        /* Проверяем, что получен корректный id (парсится в Long) */
-        Long id;
-        try {
-            id = Long.parseLong(req.getParameter("id"));
-        } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        /* Проверим, что параметр id парсится в Long */
+        Long id = FilterUtil.getIdOrNullAndBadRequest(req, resp);
+        if (id == null) {
             return;
         }
 

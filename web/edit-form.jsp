@@ -22,7 +22,7 @@
 <jsp:useBean id="loggedUser" scope="session" class="model.User"/>
 
 <c:set var="title" value="Register new user"/>
-<c:set var="action" value="insert"/>
+<c:set var="action" value="new"/>
 <c:set var="btm_text" value="Back to Login"/>
 <c:if test="${user.id != null}">
     <c:set var="title" value="Edit user"/>
@@ -72,7 +72,7 @@
         </label>
         <input type="submit" value="save">
     </form>
-    <a id="bottom_link" class="link_button" href="list"><c:out value="${btm_text}"/></a>
+    <a id="bottom_link" class="link_button" href="${pageContext.request.contextPath}"><c:out value="${btm_text}"/></a>
 </div>
 </body>
 </html>

@@ -4,8 +4,11 @@ import model.User;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ServletUtil {
-    public static User getUserFromRequestParam(HttpServletRequest req) {
+final class ServletUtil {
+    private ServletUtil() {
+    }
+
+    static User getUserFromRequestParam(HttpServletRequest req) {
         String idStr = req.getParameter("id");
         Long id = (idStr == null) ? null : Long.valueOf(idStr);
         String email = req.getParameter("email");
